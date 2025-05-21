@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chatroom v1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Inter', sans-serif;
       background: linear-gradient(120deg, #1f1f1f, #3a3a3a);
       color: #f1f1f1;
       display: flex;
@@ -58,7 +59,7 @@
     }
 
     #messages p span.name {
-      font-weight: bold;
+      font-weight: 600;
       color: #7dd87d;
     }
 
@@ -179,20 +180,24 @@
       const messagesRef = db.ref("messages");
       messagesRef.off();
 
-      messagesRef.limitToLast(100).on("child_added", (snapshot) => {
-        const data = snapshot.val();
-        const p = document.createElement("p");
-        p.innerHTML = `<span class="name">${escapeHtml(data.name)}:</span> ${formatMessage(data.text)}`;
+      messagesRef.limitToLast(100).on("value", (snapshot) => {
+        messagesDiv.innerHTML = "";
+        const messages = snapshot.val();
+        for (let key in messages) {
+          const data = messages[key];
+          const p = document.createElement("p");
+          p.innerHTML = `<span class="name">${escapeHtml(data.name)}:</span> ${formatMessage(data.text)}`;
 
-        if (data.name === username) {
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "🗑️";
-          delBtn.className = "delete-btn";
-          delBtn.onclick = () => snapshot.ref.remove();
-          p.appendChild(delBtn);
+          if (data.name === username) {
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "🗑️";
+            delBtn.className = "delete-btn";
+            delBtn.onclick = () => db.ref("messages").child(key).remove();
+            p.appendChild(delBtn);
+          }
+
+          messagesDiv.appendChild(p);
         }
-
-        messagesDiv.appendChild(p);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       });
     }
