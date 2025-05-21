@@ -7,7 +7,8 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(120deg, #ece9e6, #ffffff);
+      background: linear-gradient(120deg, #1f1f1f, #3a3a3a);
+      color: #f1f1f1;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -24,7 +25,9 @@
       padding: 12px;
       font-size: 1rem;
       border-radius: 8px;
-      border: 1px solid #ccc;
+      border: 1px solid #555;
+      background-color: #2c2c2c;
+      color: #f1f1f1;
     }
 
     button {
@@ -32,13 +35,18 @@
       color: white;
       border: none;
       cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
     }
 
     #messages {
       height: 300px;
       overflow-y: scroll;
-      background: #fff;
-      border: 2px solid #333;
+      background: #1f1f1f;
+      border: 2px solid #888;
       border-radius: 10px;
       padding: 10px;
       margin-top: 20px;
@@ -46,11 +54,12 @@
 
     #messages p {
       margin: 6px 0;
+      position: relative;
     }
 
-    #messages p span {
+    #messages p span.name {
       font-weight: bold;
-      color: #333;
+      color: #7dd87d;
     }
 
     #inputForm {
@@ -61,6 +70,23 @@
 
     #chat {
       display: none;
+    }
+
+    .online-users {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #bbb;
+    }
+
+    .delete-btn {
+      position: absolute;
+      right: 5px;
+      top: 0;
+      background: transparent;
+      border: none;
+      color: red;
+      cursor: pointer;
+      font-size: 0.8rem;
     }
   </style>
 </head>
@@ -74,6 +100,7 @@
   </div>
 
   <div id="chat">
+    <div class="online-users" id="onlineUsers"></div>
     <div id="messages" aria-live="polite"></div>
     <form id="inputForm">
       <input type="text" id="messageInput" placeholder="Nachricht schreiben..." required />
@@ -91,7 +118,7 @@
       authDomain: "chatroom-v1-593d5.firebaseapp.com",
       databaseURL: "https://chatroom-v1-593d5-default-rtdb.firebaseio.com",
       projectId: "chatroom-v1-593d5",
-      storageBucket: "chatroom-v1-593d5.firebasestorage.app",
+      storageBucket: "chatroom-v1-593d5.appspot.com",
       messagingSenderId: "896893640100",
       appId: "1:896893640100:web:541435187c8ab13ce2b531",
       measurementId: "G-2SDN322ZSE"
@@ -100,8 +127,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let username = "";
-
     const loginDiv = document.getElementById("login");
     const chatDiv = document.getElementById("chat");
     const usernameInput = document.getElementById("username");
@@ -109,16 +134,32 @@
     const messageInput = document.getElementById("messageInput");
     const inputForm = document.getElementById("inputForm");
     const messagesDiv = document.getElementById("messages");
+    const onlineUsersDiv = document.getElementById("onlineUsers");
+
+    let username = "";
+    const usersRef = db.ref("onlineUsers");
+
+    window.addEventListener("load", () => {
+      const storedName = localStorage.getItem("chat_username");
+      if (storedName) {
+        username = storedName;
+        loginDiv.style.display = "none";
+        chatDiv.style.display = "block";
+        addUserOnline();
+        listenForMessages();
+        listenForOnlineUsers();
+      }
+    });
 
     startChat.addEventListener("click", () => {
       username = usernameInput.value.trim();
-      if (!username) {
-        alert("Bitte gib deinen Namen ein.");
-        return;
-      }
+      if (!username) return alert("Bitte gib deinen Namen ein.");
+      localStorage.setItem("chat_username", username);
       loginDiv.style.display = "none";
       chatDiv.style.display = "block";
+      addUserOnline();
       listenForMessages();
+      listenForOnlineUsers();
     });
 
     inputForm.addEventListener("submit", (e) => {
@@ -136,21 +177,48 @@
 
     function listenForMessages() {
       const messagesRef = db.ref("messages");
-      messagesRef.off(); // remove old listeners
+      messagesRef.off();
 
       messagesRef.limitToLast(100).on("child_added", (snapshot) => {
         const data = snapshot.val();
         const p = document.createElement("p");
-        p.innerHTML = `<span>${escapeHtml(data.name)}:</span> ${escapeHtml(data.text)}`;
+        p.innerHTML = `<span class="name">${escapeHtml(data.name)}:</span> ${formatMessage(data.text)}`;
+
+        // Nur eigene Nachrichten können gelöscht werden
+        if (data.name === username) {
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "🗑️";
+          delBtn.className = "delete-btn";
+          delBtn.onclick = () => snapshot.ref.remove();
+          p.appendChild(delBtn);
+        }
+
         messagesDiv.appendChild(p);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       });
+    }
+
+    function formatMessage(text) {
+      return escapeHtml(text).replace(/:\)/g, "😊").replace(/:D/g, "😄").replace(/<3/g, "❤️");
     }
 
     function escapeHtml(text) {
       const div = document.createElement("div");
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    function addUserOnline() {
+      const userRef = usersRef.child(username);
+      userRef.set(true);
+      userRef.onDisconnect().remove();
+    }
+
+    function listenForOnlineUsers() {
+      usersRef.on("value", (snapshot) => {
+        const users = Object.keys(snapshot.val() || {});
+        onlineUsersDiv.textContent = `Online: ${users.join(", ")}`;
+      });
     }
   </script>
 </body>
