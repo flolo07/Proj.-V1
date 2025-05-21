@@ -3,137 +3,230 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Würfelspiel gegen Bot</title>
+  <title>Würfelspiel gegen Bot mit Skins</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap');
+
     body {
       background: linear-gradient(135deg, #0b3d0b, #145214);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #ddd;
+      font-family: 'Montserrat', sans-serif;
       margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       padding: 20px;
+      color: #ddd;
+      user-select: none;
     }
+
     #gameContainer {
       background: #121a12;
-      border: 3px solid #4caf50;
       border-radius: 12px;
-      padding: 20px;
-      max-width: 480px;
+      max-width: 520px;
       width: 100%;
+      padding: 25px 30px;
       box-shadow: 0 0 15px #4caf50;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 20px;
+      position: relative;
     }
+
     h1 {
-      text-align: center;
       color: #adebad;
-      margin-bottom: 10px;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 10px 0;
       text-shadow: 0 0 8px #4caf50;
     }
+
+    /* Skins Rahmen & Farben */
+    .skin {
+      border: 4px solid;
+      border-radius: 14px;
+      padding: 18px 20px 25px 20px;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+      background-repeat: no-repeat;
+      background-position: bottom right;
+      background-size: 80px 80px;
+    }
+    .skin1 {
+      border-color: #4caf50;
+      background-color: #163c16;
+      background-image: url('https://i.imgur.com/W4XqZ9B.png'); /* Muster grün */
+    }
+    .skin2 {
+      border-color: #c62828;
+      background-color: #3a0b0b;
+      background-image: url('https://i.imgur.com/8cFcmNN.png'); /* Muster rot */
+    }
+    .skin3 {
+      border-color: #bfa536;
+      background-color: #342e0b;
+      background-image: url('https://i.imgur.com/WjH8hSA.png'); /* Muster gold */
+    }
+    /* Du kannst gerne noch mehr Skins hinzufügen */
+
+    #skinSelector {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .skinButton {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: border-color 0.3s ease;
+      box-shadow: 0 0 5px rgba(0,0,0,0.4);
+    }
+    .skinButton:hover {
+      border-color: #fff;
+    }
+    .skinButton.active {
+      border-color: #fff;
+      box-shadow: 0 0 10px #fff;
+    }
+    .skin1Btn { background-color: #4caf50; }
+    .skin2Btn { background-color: #c62828; }
+    .skin3Btn { background-color: #bfa536; }
+
+    /* Einsatz */
     #betSection label {
+      font-weight: 600;
       font-size: 1.1rem;
-      display: block;
-      margin-bottom: 6px;
       color: #a2d9a2;
+      margin-bottom: 8px;
+      display: block;
     }
     #betRange {
       width: 100%;
       accent-color: #4caf50;
       cursor: pointer;
+      border-radius: 6px;
+      height: 10px;
+      margin-bottom: 10px;
+      background: #264726;
     }
+
     #betAmount {
-      font-weight: bold;
-      color: #adebad;
-    }
-    #currentScore {
-      font-size: 2.4rem;
       font-weight: 700;
+      font-size: 1.3rem;
       color: #adebad;
       text-align: center;
-      margin-top: 10px;
-      text-shadow: 0 0 6px #4caf50;
+      margin-bottom: 12px;
+      user-select: none;
     }
-    #resultMessage {
-      font-size: 2rem;
+
+    /* Punktzahl */
+    #currentScore {
+      font-size: 2.6rem;
       font-weight: 800;
       text-align: center;
-      margin-top: 15px;
-      min-height: 48px;
-      border-radius: 10px;
-      padding: 8px 0;
+      color: #adebad;
+      margin-bottom: 10px;
+      text-shadow: 0 0 6px #4caf50;
+    }
+
+    /* Ergebnis */
+    #resultMessage {
+      font-size: 2.4rem;
+      font-weight: 900;
+      text-align: center;
+      padding: 14px 0;
+      border-radius: 14px;
       user-select: none;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 56px;
+      box-shadow: 0 0 6px transparent;
+      transition: all 0.3s ease;
     }
     #resultMessage.win {
-      background-color: #1e4d1e;
       color: #7fff7f;
-      box-shadow: 0 0 10px #7fff7f;
+      background-color: #1e4d1e;
+      box-shadow: 0 0 15px #7fff7f;
     }
     #resultMessage.lose {
-      background-color: #4d1e1e;
       color: #ff7070;
-      box-shadow: 0 0 10px #ff7070;
+      background-color: #4d1e1e;
+      box-shadow: 0 0 15px #ff7070;
     }
+
+    /* Buttons */
     #buttons {
       display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 15px;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 10px;
     }
     button {
-      background: #222;
-      border: 2px solid #4caf50;
-      color: #adebad;
-      font-weight: 600;
-      padding: 12px 25px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      transition: background-color 0.3s, color 0.3s;
-      user-select: none;
       flex: 1;
+      background: #222;
+      border: 3px solid #4caf50;
+      color: #adebad;
+      font-weight: 700;
+      padding: 14px 0;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      user-select: none;
     }
     button:disabled {
       border-color: #555;
       color: #555;
-      cursor: not-allowed;
       background-color: #121212;
+      cursor: not-allowed;
     }
     button:hover:not(:disabled) {
       background-color: #4caf50;
       color: #121a12;
-      font-weight: 700;
+      font-weight: 800;
+      box-shadow: 0 0 8px #4caf50;
     }
+
+    /* Status & Bot Name */
     #status {
-      font-size: 1rem;
-      text-align: center;
+      font-size: 1.1rem;
       color: #a2d9a2;
-      min-height: 20px;
+      text-align: center;
+      min-height: 26px;
       user-select: none;
+      margin-top: 5px;
     }
     #botName {
       font-weight: 700;
+      font-style: italic;
       color: #a6d7a6;
       text-align: center;
-      margin-top: 5px;
-      font-style: italic;
+      margin-top: 0;
+      user-select: none;
     }
   </style>
 </head>
 <body>
-  <div id="gameContainer">
+  <div id="gameContainer" class="skin skin1">
+
     <h1>🎲 Würfelspiel gegen Bot</h1>
+
+    <!-- Skin-Auswahl -->
+    <div id="skinSelector">
+      <div class="skinButton skin1Btn active" data-skin="skin1" title="Grün"></div>
+      <div class="skinButton skin2Btn" data-skin="skin2" title="Rot"></div>
+      <div class="skinButton skin3Btn" data-skin="skin3" title="Gold"></div>
+    </div>
 
     <div id="betSection">
       <label for="betRange">Einsatz: <span id="betAmount">10</span> Coins</label>
       <input type="range" id="betRange" min="1" max="100" value="10" />
-      <div id="currentScore">Deine Punktzahl: 0</div>
-      <div id="resultMessage"></div>
     </div>
+
+    <div id="currentScore">Deine Punktzahl: 0</div>
+
+    <div id="resultMessage"></div>
 
     <div id="buttons">
       <button id="startBtn">Start</button>
@@ -146,6 +239,8 @@
   </div>
 
   <script>
+    const gameContainer = document.getElementById('gameContainer');
+    const skinButtons = document.querySelectorAll('.skinButton');
     const betRange = document.getElementById('betRange');
     const betAmount = document.getElementById('betAmount');
     const currentScore = document.getElementById('currentScore');
@@ -170,6 +265,16 @@
 
     let botName = getRandomBotName();
     botNameDisplay.textContent = `Gegner: ${botName}`;
+
+    // Skin wechseln
+    skinButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        skinButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const skinClass = btn.getAttribute('data-skin');
+        gameContainer.className = 'skin ' + skinClass;
+      });
+    });
 
     betRange.addEventListener('input', () => {
       betAmount.textContent = betRange.value;
@@ -197,24 +302,16 @@
     rollBtn.addEventListener('click', () => {
       if (!gameStarted || playerStopped) return;
 
-      // Spieler würfelt 1-20 Punkte pro Wurf
       const playerRoll = Math.floor(Math.random() * 20) + 1;
       playerScore += playerRoll;
       currentScore.textContent = `Deine Punktzahl: ${playerScore}`;
 
-      // Bot würfelt solange er < 85 ist, 1-15 Punkte
-      if (botScore < 85) {
-        const botRoll = Math.floor(Math.random() * 15) + 1;
-        botScore += botRoll;
-      }
-
-      // Automatisch stoppen wenn Spieler über 100 geht
+      // Bot würfelt nicht sichtbar, bis Spieler stoppt
       if (playerScore > 100) {
         endGame(false);
         return;
       }
 
-      // Wenn Spieler erreicht 100 oder mehr, sofort gewinnen
       if (playerScore === 100) {
         endGame(true);
         return;
@@ -227,13 +324,12 @@
       if (!gameStarted || playerStopped) return;
       playerStopped = true;
 
-      // Bot würfelt weiter, bis >= playerScore oder über 100
+      // Bot würfelt bis er >= Spieler oder über 100
       while (botScore < playerScore && botScore < 100) {
         const botRoll = Math.floor(Math.random() * 15) + 1;
         botScore += botRoll;
       }
 
-      // Ergebnis auswerten
       const playerWon = (botScore > 100) || (playerScore > botScore && playerScore <= 100);
 
       endGame(playerWon);
