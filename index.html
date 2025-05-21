@@ -3,279 +3,249 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CoinGame Royal Edition</title>
+  <title>Coin Duel</title>
   <style>
     body {
+      margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: repeating-linear-gradient(45deg, #1f1f1f, #1f1f1f 20px, #2b2b2b 20px, #2b2b2b 40px);
-      color: #e2ffe2;
+      background: repeating-linear-gradient(45deg, #003300, #003300 20px, #004d00 20px, #004d00 40px);
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px;
-    }
-    .box {
-      background-color: #003300;
-      border: 2px solid gold;
-      border-radius: 12px;
+      justify-content: flex-start;
       padding: 20px;
-      margin: 20px;
-      width: 320px;
-      box-shadow: 0 0 20px gold;
     }
-    h1, h2 {
-      color: gold;
+
+    h1 {
+      margin: 10px 0;
     }
-    button {
-      padding: 10px;
-      margin: 5px;
-      border-radius: 10px;
-      border: none;
-      background-color: #009900;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background-color: #00cc00;
-    }
-    input, select {
-      padding: 8px;
-      margin: 5px;
-      border-radius: 5px;
-      border: 1px solid #555;
-    }
-    .flex {
+
+    .container {
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 1200px;
     }
-    .history, .stats, .princess, .shop, .bonus {
-      background: #001a00;
-      border: 1px solid #666;
-      border-radius: 10px;
+
+    .side-panel {
+      flex: 1;
+      font-size: 0.9rem;
+    }
+
+    .game-area {
+      flex: 2;
+      background: #0d0d0d;
+      padding: 20px;
+      border-radius: 20px;
+      border: 3px solid gold;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    button, select, input[type="number"] {
+      margin: 5px;
       padding: 10px;
-      margin-top: 10px;
-    }
-    .skin-toggle {
-      display: inline-block;
-      padding: 5px 10px;
-      margin: 3px;
-      border: 2px solid #ccc;
-      border-radius: 5px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
       cursor: pointer;
     }
-    .skin-toggle.active {
-      border-color: gold;
-      background-color: #004d00;
+
+    button {
+      background-color: #228B22;
+      color: white;
     }
-    .princess img {
-      width: 100px;
+
+    button:hover {
+      background-color: #2ecc71;
+    }
+
+    .coin-display, .history, .stats, .princess, .skins {
+      margin: 10px 0;
+      background: #1c1c1c;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .princess {
+      font-style: italic;
+      font-size: 0.9rem;
+      text-align: center;
+      background: none;
+    }
+
+    .princess-pixel {
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
+      background-image: url('https://i.imgur.com/tVbT6Nd.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      margin: 0 auto 5px;
+    }
+
+    .skin-option {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      margin: 2px;
+      border: 2px solid white;
+      cursor: pointer;
+    }
+
+    .active-skin {
+      border: 2px solid gold;
     }
   </style>
 </head>
 <body>
-  <h1>🎲 CoinGame Royal</h1>
-
-  <div class="flex">
-    <div class="box">
-      <h2>Dein Konto</h2>
-      <p>Coins: <span id="coins">1000</span></p>
-      <p>Kredit: <span id="credit">0</span></p>
-      <div>
-        <input type="number" id="creditAmount" placeholder="Kreditbetrag" />
-        <input type="number" id="creditRounds" placeholder="Runden" />
-        <button onclick="takeCredit()">Kredit aufnehmen</button>
+  <h1>💰 Coin Duel</h1>
+  <div class="container">
+    <div class="side-panel">
+      <div class="coin-display" id="coinDisplay">💵 Coins: 0</div>
+      <div class="coin-display">💳 Kredit: <input type="number" id="creditAmount" min="1" placeholder="Betrag" style="width: 70px;"> für <input type="number" id="roundsDelay" min="1" max="10" placeholder="Runden" style="width: 60px;"> Runden <button onclick="takeLoan()">Nehmen</button></div>
+      <div class="stats" id="stats">📊 Stats: 0W / 0L</div>
+      <div class="skins">
+        <div>🎨 Skin wählen:</div>
+        <div id="skinsContainer"></div>
       </div>
     </div>
-
-    <div class="box">
-      <h2>Spielrunde</h2>
-      <p>Setze Coins:</p>
-      <input type="range" id="bet" min="1" max="100" value="10" />
-      <span id="betDisplay">10</span>
-      <br />
-      <button onclick="draw()">Würfeln</button>
-      <button onclick="stopGame()">Stoppen</button>
-      <p>Deine Punkte: <span id="playerScore">0</span></p>
-      <p id="botName">Bot:</p>
-      <p>Bot Punkte: <span id="botScore">0</span></p>
-    </div>
-
-    <div class="box history">
-      <h2>Letzte Spiele</h2>
-      <ul id="history"></ul>
-    </div>
-
-    <div class="box stats">
-      <h2>Statistiken</h2>
-      <p>Gewonnen: <span id="won">0</span></p>
-      <p>Verloren: <span id="lost">0</span></p>
-      <p>Letzte Auszahlung: <span id="lastBonus">Nie</span></p>
-    </div>
-
-    <div class="box bonus">
-      <h2>Täglicher Bonus</h2>
-      <button onclick="claimBonus()">100 Coins abholen</button>
-      <p>Nächster Bonus in: <span id="bonusTimer">...</span></p>
-    </div>
-
-    <div class="box shop">
-      <h2>Skins</h2>
-      <div id="skins"></div>
-    </div>
-
-    <div class="box princess">
-      <h2>Prinzessin</h2>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Princess_icon.png/600px-Princess_icon.png" alt="Prinzessin" />
-      <p id="princessTalk">Willkommen, edler Ritter!</p>
+    <div class="game-area">
+      <div class="princess">
+        <div class="princess-pixel"></div>
+        <div id="princessComment">Willkommen, Held!</div>
+      </div>
+      <div class="coin-display">
+        Einsatz: <input type="number" id="bet" value="10" min="1" style="width: 60px;">
+        <button onclick="startGame()">Ziehen</button>
+      </div>
+      <div id="scoreDisplay">🎯 Dein Punktestand: 0</div>
+      <div id="botScore">🤖 Bot Punktestand: 0</div>
+      <div class="history" id="history">📜 Letzte Spiele:</div>
     </div>
   </div>
 
   <script>
-    let coins = 1000;
-    let credit = 0;
-    let playerScore = 0;
+    let coins = 100;
+    let score = 0;
     let botScore = 0;
-    let gameActive = true;
-    let currentBet = 10;
-    let creditPaybacks = [];
-    let history = [];
-    let skins = ["default", "blue", "red", "purple", "dots", "lines", "tiger", "neon"];
-    let currentSkin = "default";
-    let won = 0;
-    let lost = 0;
+    let wins = 0, losses = 0;
+    let round = 0;
+    let loans = [];
+    let currentSkin = '';
+    const princessQuotes = [
+      "Du schaffst das!",
+      "Viel Glück!",
+      "Pass auf den Bot auf!",
+      "Nicht gierig werden!",
+      "Mut steht dir gut!"
+    ];
 
-    document.getElementById("bet").addEventListener("input", e => {
-      currentBet = parseInt(e.target.value);
-      document.getElementById("betDisplay").textContent = currentBet;
-    });
+    const skins = [
+      "#1abc9c", "#3498db", "#9b59b6", "#f1c40f",
+      "#e67e22", "#e74c3c", "#ecf0f1", "#95a5a6"
+    ];
 
     function updateUI() {
-      document.getElementById("coins").textContent = coins;
-      document.getElementById("credit").textContent = credit;
-      document.getElementById("playerScore").textContent = playerScore;
-      document.getElementById("botScore").textContent = botScore;
-      document.getElementById("won").textContent = won;
-      document.getElementById("lost").textContent = lost;
+      document.getElementById("coinDisplay").textContent = `💵 Coins: ${coins}`;
+      document.getElementById("scoreDisplay").textContent = `🎯 Dein Punktestand: ${score}`;
+      document.getElementById("botScore").textContent = `🤖 Bot Punktestand: ${botScore}`;
+      document.getElementById("stats").textContent = `📊 Stats: ${wins}W / ${losses}L`;
     }
 
-    function draw() {
-      if (!gameActive) return;
-      if (playerScore >= 100 || currentBet > coins) return;
-      playerScore += Math.floor(Math.random() * 20 + 1);
-      coins -= currentBet;
-      updateUI();
-      if (playerScore >= 100) stopGame();
+    function randomName() {
+      const names = ["Botty", "AIlex", "CyberMax", "RoboRalf", "Chip"];
+      return names[Math.floor(Math.random() * names.length)];
     }
 
-    function stopGame() {
-      gameActive = false;
-      botScore = 0;
-      let name = ["Sir Coinalot", "Botricia", "Gambletron", "Luckius", "Princess Botra"];
-      let bot = name[Math.floor(Math.random() * name.length)];
-      document.getElementById("botName").textContent = `Bot (${bot}):`;
-      while (botScore < playerScore && botScore < 100) {
-        botScore += Math.floor(Math.random() * 20 + 1);
+    function startGame() {
+      const bet = parseInt(document.getElementById("bet").value);
+      if (isNaN(bet) || bet <= 0 || bet > coins) return alert("Ungültiger Einsatz.");
+
+      coins -= bet;
+      let yourScore = 0;
+      let bot = randomName();
+      let botPts = 0;
+      let botCards = Math.floor(Math.random() * 10) + 1;
+
+      for (let i = 0; i < botCards; i++) {
+        botPts += Math.floor(Math.random() * 20) + 1;
+        if (botPts >= 100) break;
       }
-      let result = "Verloren";
-      if (playerScore <= 100 && (botScore > 100 || playerScore > botScore)) {
-        result = "Gewonnen";
-        let reward = currentBet + Math.floor(currentBet * 0.5);
-        coins += reward;
-        won++;
+
+      while (yourScore < 100) {
+        let draw = Math.floor(Math.random() * 20) + 1;
+        if (yourScore + draw > 100) break;
+        yourScore += draw;
+      }
+
+      score = yourScore;
+      botScore = botPts;
+
+      const princess = document.getElementById("princessComment");
+      princess.textContent = princessQuotes[Math.floor(Math.random() * princessQuotes.length)];
+
+      if ((yourScore > botPts && yourScore <= 100) || botPts > 100) {
+        coins += Math.floor(bet * 1.5);
+        wins++;
+        addToHistory(`✅ Gewonnen mit ${yourScore} gegen ${bot} (${botPts})`);
       } else {
-        lost++;
+        losses++;
+        addToHistory(`❌ Verloren mit ${yourScore} gegen ${bot} (${botPts})`);
       }
-      history.unshift(`${result} – Du: ${playerScore}, Bot: ${botScore}`);
-      if (history.length > 5) history.pop();
-      document.getElementById("history").innerHTML = history.map(h => `<li>${h}</li>`).join("");
-      playerScore = 0;
-      botScore = 0;
-      gameActive = true;
+
+      updateLoans();
       updateUI();
-      princessTalk(result === "Gewonnen" ? "Bravo! Du hast ihn geschlagen!" : "Oh nein, er war stärker!");
-      handleCreditPayback();
     }
 
-    function takeCredit() {
+    function takeLoan() {
       const amount = parseInt(document.getElementById("creditAmount").value);
-      const rounds = parseInt(document.getElementById("creditRounds").value);
-      if (isNaN(amount) || isNaN(rounds)) return;
-      coins += amount;
-      credit += amount;
-      creditPaybacks.push({ due: rounds, total: Math.floor(amount * (1 + rounds / 100)) });
-      updateUI();
+      const rounds = parseInt(document.getElementById("roundsDelay").value);
+      if (amount > 0 && rounds > 0) {
+        coins += amount;
+        loans.push({ amount: Math.floor(amount * 1.01 * rounds), round: round + rounds });
+        updateUI();
+      }
     }
 
-    function handleCreditPayback() {
-      creditPaybacks.forEach(c => c.due--);
-      let repaid = 0;
-      creditPaybacks = creditPaybacks.filter(c => {
-        if (c.due <= 0) {
-          coins -= c.total;
-          credit -= c.total;
-          repaid += c.total;
+    function updateLoans() {
+      round++;
+      loans = loans.filter(loan => {
+        if (loan.round === round) {
+          coins -= loan.amount;
+          addToHistory(`💸 Rückzahlung: -${loan.amount} Coins`);
           return false;
         }
         return true;
       });
-      if (repaid > 0) princessTalk(`Du hast ${repaid} Coins zurückgezahlt.`);
     }
 
-    function princessTalk(text) {
-      document.getElementById("princessTalk").textContent = text;
+    function addToHistory(entry) {
+      const hist = document.getElementById("history");
+      hist.innerHTML = `📜 Letzte Spiele:<br>` + entry + '<br>' + hist.innerHTML.split('<br>').slice(1, 6).join('<br>');
     }
 
-    function claimBonus() {
-      const last = localStorage.getItem("lastBonus") || 0;
-      const now = Date.now();
-      if (now - last >= 86400000) {
-        coins += 100;
-        localStorage.setItem("lastBonus", now);
-        document.getElementById("lastBonus").textContent = new Date(now).toLocaleString();
-        princessTalk("Hier sind deine täglichen Coins!");
-        updateUI();
-      } else {
-        princessTalk("Morgen wieder!");
-      }
-    }
-
-    function loadBonusTimer() {
-      setInterval(() => {
-        const last = localStorage.getItem("lastBonus") || 0;
-        const next = Math.max(0, 86400000 - (Date.now() - last));
-        const h = Math.floor(next / 3600000);
-        const m = Math.floor((next % 3600000) / 60000);
-        const s = Math.floor((next % 60000) / 1000);
-        document.getElementById("bonusTimer").textContent = `${h}h ${m}m ${s}s`;
-      }, 1000);
-    }
-
-    function initSkins() {
-      const container = document.getElementById("skins");
-      skins.forEach(skin => {
-        const btn = document.createElement("div");
-        btn.className = "skin-toggle";
-        btn.textContent = skin;
-        btn.onclick = () => {
-          document.body.className = skin;
-          document.querySelectorAll(".skin-toggle").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          princessTalk(`Ich finde das ${skin}-Outfit sehr stilvoll!`);
+    function renderSkins() {
+      const cont = document.getElementById("skinsContainer");
+      skins.forEach(color => {
+        const el = document.createElement("div");
+        el.className = "skin-option";
+        el.style.backgroundColor = color;
+        el.onclick = () => {
+          currentSkin = color;
+          document.querySelectorAll('.skin-option').forEach(e => e.classList.remove('active-skin'));
+          el.classList.add('active-skin');
+          document.querySelector(".game-area").style.borderColor = color;
         };
-        container.appendChild(btn);
+        cont.appendChild(el);
       });
     }
 
-    // Init
+    renderSkins();
     updateUI();
-    initSkins();
-    loadBonusTimer();
-    const lastBonus = localStorage.getItem("lastBonus") || 0;
-    if (lastBonus > 0) document.getElementById("lastBonus").textContent = new Date(parseInt(lastBonus)).toLocaleString();
   </script>
 </body>
 </html>
