@@ -3,289 +3,169 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Würfelspiel mit Kredit, Skins & Boni</title>
+<title>Würfelspiel mit Schwierigkeitsgrad</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap');
-
   :root {
     --color-bg: #121a12;
     --color-accent: #4caf50;
     --color-text: #adebad;
     --color-border: #4caf50;
-    --color-result-win-bg: #1e4d1e;
-    --color-result-win-text: #7fff7f;
-    --color-result-lose-bg: #4d1e1e;
-    --color-result-lose-text: #ff7070;
+    --color-result-win-bg: #4caf5088;
+    --color-result-win-text: #adebad;
+    --color-result-lose-bg: #ff4c4c88;
+    --color-result-lose-text: #ff0000;
   }
-
   body {
-    background: var(--color-bg);
-    font-family: 'Montserrat', sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     padding: 20px;
-    color: var(--color-text);
     user-select: none;
   }
-
   #gameContainer {
-    background: var(--color-bg);
+    max-width: 480px;
+    margin: 0 auto;
+    background-color: #000000cc;
+    border: 2px solid var(--color-border);
     border-radius: 12px;
-    max-width: 580px;
-    width: 100%;
-    padding: 25px 30px;
-    box-shadow: 0 0 20px var(--color-accent);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    position: relative;
-    border: 3px solid var(--color-border);
+    padding: 15px;
   }
-
   h1 {
-    color: var(--color-accent);
-    font-weight: 700;
-    text-align: center;
-    margin: 0 0 10px 0;
-    text-shadow: 0 0 8px var(--color-accent);
-  }
-
-  /* Skin-Auswahl & Shop */
-  #skinSelector {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-  }
-
-  .skinButton {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 3px solid transparent;
-    transition: border-color 0.3s ease;
-    box-shadow: 0 0 5px rgba(0,0,0,0.4);
-    position: relative;
-  }
-  .skinButton:hover {
-    border-color: var(--color-text);
-  }
-  .skinButton.active {
-    border-color: var(--color-text);
-    box-shadow: 0 0 12px var(--color-accent);
-  }
-
-  /* Skin Farben */
-  .skin1Btn { background-color: #4caf50; }
-  .skin2Btn { background-color: #c62828; }
-  .skin3Btn { background-color: #bfa536; }
-  .skin4Btn { background-color: #1a237e; }
-  .skin5Btn { background-color: #6a1b9a; }
-  .skin6Btn { background-color: #00695c; }
-  .skin7Btn { background-color: #ef6c00; }
-  .skin8Btn { background-color: #d32f2f; }
-
-  /* Skin Preise */
-  .skinPriceTag {
-    position: absolute;
-    bottom: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 10px;
-    color: var(--color-text);
-    user-select: none;
-  }
-
-  /* Einsatz */
-  #betSection label {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--color-accent);
-    margin-bottom: 6px;
-    display: block;
-  }
-  #betRange {
-    width: 100%;
-    accent-color: var(--color-accent);
-    cursor: pointer;
-    border-radius: 6px;
-    height: 10px;
-    margin-bottom: 10px;
-    background: #264726;
-  }
-
-  #betAmount {
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: var(--color-text);
-    text-align: center;
-    margin-bottom: 8px;
-    user-select: none;
-  }
-
-  /* Punktzahl */
-  #currentScore {
-    font-size: 2.4rem;
-    font-weight: 800;
-    text-align: center;
-    color: var(--color-text);
-    margin-bottom: 10px;
-    text-shadow: 0 0 6px var(--color-accent);
-  }
-
-  /* Ergebnis */
-  #resultMessage {
-    font-size: 2rem;
-    font-weight: 900;
-    text-align: center;
-    padding: 12px 0;
-    border-radius: 14px;
-    user-select: none;
-    min-height: 56px;
-    box-shadow: 0 0 6px transparent;
-    transition: all 0.3s ease;
-  }
-  #resultMessage.win {
-    color: var(--color-result-win-text);
-    background-color: var(--color-result-win-bg);
-    box-shadow: 0 0 15px var(--color-result-win-text);
-  }
-  #resultMessage.lose {
-    color: var(--color-result-lose-text);
-    background-color: var(--color-result-lose-bg);
-    box-shadow: 0 0 15px var(--color-result-lose-text);
-  }
-
-  /* Buttons */
-  #buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    margin-top: 10px;
-  }
-  button {
-    flex: 1;
-    background: #222;
-    border: 3px solid var(--color-accent);
-    color: var(--color-text);
-    font-weight: 700;
-    padding: 14px 0;
-    border-radius: 14px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    user-select: none;
-  }
-  button:disabled {
-    border-color: #555;
-    color: #555;
-    background-color: #121212;
-    cursor: not-allowed;
-  }
-  button:hover:not(:disabled) {
-    background-color: var(--color-accent);
-    color: var(--color-bg);
-    font-weight: 800;
-    box-shadow: 0 0 8px var(--color-accent);
-  }
-
-  /* Status & Bot Name */
-  #status {
-    font-size: 1.1rem;
-    color: var(--color-text);
-    text-align: center;
-    min-height: 28px;
-    user-select: none;
-    margin-top: 5px;
-  }
-  #botName {
-    font-weight: 700;
-    font-style: italic;
-    color: var(--color-accent);
     text-align: center;
     margin-top: 0;
-    user-select: none;
   }
-
-  /* Kreditbereich */
-  #creditSection {
-    background-color: #0d120d;
-    border-radius: 12px;
-    padding: 12px 15px;
-    box-shadow: 0 0 10px var(--color-accent);
-    margin-top: 15px;
-    color: var(--color-text);
+  #skinSelector {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
   }
-  #creditSection label {
-    font-weight: 600;
-    font-size: 1rem;
-  }
-  #creditInput, #creditRounds {
-    width: 48%;
-    padding: 7px 8px;
-    margin: 5px 1% 10px 0;
+  .skinButton {
+    width: 44px;
+    height: 44px;
     border-radius: 8px;
-    border: 1.5px solid var(--color-accent);
-    background-color: #213421;
-    color: var(--color-text);
-    font-weight: 600;
-    font-size: 1rem;
+    border: 2px solid var(--color-border);
+    cursor: pointer;
+    position: relative;
+    margin: 3px;
+    transition: all 0.3s ease;
   }
-  #creditRounds {
-    margin-left: 2%;
+  .skinButton.active {
+    box-shadow: 0 0 8px var(--color-accent);
+    border-width: 3px;
   }
-  #creditBtn {
-    width: 100%;
-    background-color: var(--color-accent);
-    border: none;
-    padding: 12px 0;
+  .skinPriceTag {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    background: var(--color-result-lose-bg);
+    color: var(--color-result-lose-text);
+    font-size: 10px;
     font-weight: 700;
-    font-size: 1.1rem;
-    border-radius: 12px;
+    border-radius: 3px;
+    padding: 0 4px;
+  }
+  #betSection {
+    margin-bottom: 12px;
+  }
+  #betAmount {
+    margin-top: 5px;
+    font-weight: 700;
+    text-align: center;
+  }
+  input[type=range] {
+    width: 100%;
+  }
+  #currentScore {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  #resultMessage {
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  #resultMessage.win {
+    color: #4caf50;
+    background-color: #4caf5088;
+    border-radius: 6px;
+    padding: 6px;
+  }
+  #resultMessage.lose {
+    color: #ff4c4c;
+    background-color: #ff4c4c88;
+    border-radius: 6px;
+    padding: 6px;
+  }
+  #buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  button {
+    background-color: var(--color-accent);
     color: var(--color-bg);
+    font-weight: 700;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  #creditBtn:hover:not(:disabled) {
-    background-color: #3ea93e;
-  }
-  #creditBtn:disabled {
-    background-color: #2f4f2f;
+  button:disabled {
+    background-color: #555555aa;
     cursor: not-allowed;
   }
-
-  /* Statistiken */
-  #stats {
-    background-color: #0d120d;
-    border-radius: 12px;
-    padding: 12px 15px;
-    color: var(--color-text);
-    font-weight: 600;
-    margin-top: 12px;
-    display: flex;
-    justify-content: space-around;
-    user-select: none;
-  }
-
-  /* Bonus Toggle */
-  #bonusToggleContainer {
-    margin-top: 12px;
-    user-select: none;
+  #status, #botName {
     text-align: center;
     font-weight: 600;
-    color: var(--color-accent);
+    margin-bottom: 8px;
   }
-  #bonusToggleCheckbox {
-    width: 18px;
-    height: 18px;
+  #creditSection {
+    margin-top: 20px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 12px;
+  }
+  #creditSection input[type=number] {
+    width: 100px;
+    margin: 6px 6px 12px 0;
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  #creditInfo {
+    font-weight: 600;
+    margin-top: 8px;
+    color: var(--color-accent);
+    text-align: center;
+  }
+  #stats {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-around;
+    font-weight: 600;
+    user-select: none;
+  }
+  /* Schwierigkeit */
+  #difficultySection {
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: 600;
+  }
+  #difficultySelect {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-weight: 700;
     cursor: pointer;
-    vertical-align: middle;
-    margin-right: 6px;
   }
 </style>
 </head>
@@ -296,6 +176,16 @@
 
   <!-- Skin Auswahl -->
   <div id="skinSelector" title="Skins auswählen oder kaufen"></div>
+
+  <!-- Schwierigkeit -->
+  <div id="difficultySection">
+    Schwierigkeit: 
+    <select id="difficultySelect">
+      <option value="leicht">Leicht</option>
+      <option value="mittel" selected>Mittel</option>
+      <option value="schwer">Schwer</option>
+    </select>
+  </div>
 
   <!-- Einsatz -->
   <div id="betSection">
@@ -334,11 +224,6 @@
     <div>Verloren: <span id="gamesLost">0</span></div>
   </div>
 
-  <!-- Bonus -->
-  <div id="bonusToggleContainer">
-    <input type="checkbox" id="bonusToggleCheckbox" />
-    <label for="bonusToggleCheckbox">Täglicher Bonus (+100 Coins)</label>
-  </div>
 </div>
 
 <script>
@@ -358,26 +243,35 @@
 
   // Skins mit Farben und Preisen
   const skins = [
-    {id: 'skin1', name: 'Grün Classic', bg: '#121a12', border: '#4caf50', accent: '#adebad', price: 0, bought: true, active: true},
-    {id: 'skin2', name: 'Rot Modern', bg: '#2f0f0f', border: '#c62828', accent: '#ff6f6f', price: 150, bought: false, active: false},
-    {id: 'skin3', name: 'Gold Royal', bg: '#3d2e0f', border: '#bfa536', accent: '#fff7a3', price: 200, bought: false, active: false},
-    {id: 'skin4', name: 'Blau Calm', bg: '#101a2a', border: '#1a237e', accent: '#859fff', price: 100, bought: false, active: false},
-    {id: 'skin5', name: 'Lila Fantasy', bg: '#2c183c', border: '#6a1b9a', accent: '#bfa3ff', price: 120, bought: false, active: false},
-    {id: 'skin6', name: 'Türkis Fresh', bg: '#05332b', border: '#00695c', accent: '#5cd9bc', price: 130, bought: false, active: false},
-    {id: 'skin7', name: 'Orange Fire', bg: '#3b1e00', border: '#ef6c00', accent: '#ffc476', price: 180, bought: false, active: false},
-    {id: 'skin8', name: 'Dunkel Rot', bg: '#210b0b', border: '#d32f2f', accent: '#ff5c5c', price: 110, bought: false, active: false}
+    {id: 'skin1', name: 'Grün Classic', bg: '#121a12', border: '#4caf50', accent: '#adebad', price: 0, bought: true},
+    {id: 'skin2', name: 'Feuer Rot', bg: '#300000', border: '#ff4444', accent: '#ff9999', price: 100, bought: false},
+    {id: 'skin3', name: 'Gold Glamour', bg: '#3c3000', border: '#d4af37', accent: '#ffdf7a', price: 200, bought: false},
+    {id: 'skin4', name: 'Blau Eis', bg: '#001430', border: '#4488ff', accent: '#aacdff', price: 150, bought: false},
+    {id: 'skin5', name: 'Lila Traum', bg: '#2a0030', border: '#b388ff', accent: '#d6b8ff', price: 150, bought: false},
+    {id: 'skin6', name: 'Orange Glut', bg: '#331a00', border: '#ffb347', accent: '#ffd79b', price: 120, bought: false},
+    {id: 'skin7', name: 'Silber Nacht', bg: '#1a1a1a', border: '#c0c0c0', accent: '#e0e0e0', price: 180, bought: false},
+    {id: 'skin8', name: 'Türkis Welle', bg: '#003230', border: '#33ccaa', accent: '#99e6d9', price: 170, bought: false},
+    {id: 'skin9', name: 'Rosa Traum', bg: '#301020', border: '#ff77bb', accent: '#ffbadc', price: 130, bought: false},
+    {id: 'skin10', name: 'Weiß Glanz', bg: '#f9f9f9', border: '#cccccc', accent: '#eeeeee', price: 160, bought: false},
   ];
 
-  // DOM-Elemente
-  const gameContainer = document.getElementById('gameContainer');
-  const skinSelector = document.getElementById('skinSelector');
+  let currentSkinIndex = 0;
+
+  // Spiel-Variablen
+  let playerScore = 0;
+  let botScore = 0;
+  let gameActive = false;
+  let playerTurn = false;
+  let botTurn = false;
+
+  // DOM Elemente
   const betRange = document.getElementById('betRange');
   const betAmountDisplay = document.getElementById('betAmount');
-  const currentScoreDisplay = document.getElementById('currentScore');
-  const resultMessage = document.getElementById('resultMessage');
   const startBtn = document.getElementById('startBtn');
   const rollBtn = document.getElementById('rollBtn');
   const stopBtn = document.getElementById('stopBtn');
+  const currentScoreDisplay = document.getElementById('currentScore');
+  const resultMessage = document.getElementById('resultMessage');
   const statusDisplay = document.getElementById('status');
   const botNameDisplay = document.getElementById('botName');
   const totalCoinsDisplay = document.getElementById('totalCoins');
@@ -388,16 +282,10 @@
   const creditRoundsInput = document.getElementById('creditRounds');
   const creditBtn = document.getElementById('creditBtn');
   const creditInfo = document.getElementById('creditInfo');
-  const bonusToggleCheckbox = document.getElementById('bonusToggleCheckbox');
+  const difficultySelect = document.getElementById('difficultySelect');
+  const skinSelector = document.getElementById('skinSelector');
 
-  // Spielstatus
-  let playerScore = 0;
-  let botScore = 0;
-  let gameStarted = false;
-  let playerStopped = false;
-  let botName = '';
-
-  // Update Anzeige aller Statistiken
+  // Anzeige aktualisieren
   function updateStats() {
     totalCoinsDisplay.textContent = totalCoins;
     gamesPlayedDisplay.textContent = gamesPlayed;
@@ -405,41 +293,30 @@
     gamesLostDisplay.textContent = gamesLost;
   }
 
-  // Update Einsatz-Anzeige
-  betAmountDisplay.textContent = betRange.value;
-  betRange.max = totalCoins < 10 ? 10 : totalCoins; // max ist mind. 10
-
-  betRange.addEventListener('input', () => {
-    betAmountDisplay.textContent = betRange.value;
-  });
-
-  // Skin Buttons rendern
+  // Skin Rendering
   function renderSkinButtons() {
     skinSelector.innerHTML = '';
-    skins.forEach((skin, i) => {
+    skins.forEach((skin, idx) => {
       const btn = document.createElement('div');
-      btn.classList.add('skinButton');
-      btn.classList.add(`skin${i+1}Btn`);
-      btn.title = `${skin.name}\nPreis: ${skin.price} Coins\n${skin.bought ? 'Gekauft' : 'Nicht gekauft'}`;
-      if(skin.active) btn.classList.add('active');
-
-      // Preis-Tag wenn nicht gekauft
-      if(!skin.bought && skin.price > 0) {
+      btn.className = 'skinButton' + (skin.bought ? '' : ' forSale');
+      btn.style.backgroundColor = skin.bg;
+      btn.style.borderColor = skin.border;
+      btn.title = skin.name + (skin.bought ? '' : ` (Kaufen: ${skin.price} Coins)`);
+      if(!skin.bought) {
         const priceTag = document.createElement('div');
-        priceTag.classList.add('skinPriceTag');
+        priceTag.className = 'skinPriceTag';
         priceTag.textContent = skin.price;
         btn.appendChild(priceTag);
       }
-
       btn.addEventListener('click', () => {
         if(skin.bought) {
-          activateSkin(i);
+          activateSkin(idx);
         } else {
           if(totalCoins >= skin.price) {
-            if(confirm(`Möchtest du den Skin "${skin.name}" für ${skin.price} Coins kaufen?`)) {
+            if(confirm(`Willst du den Skin "${skin.name}" für ${skin.price} Coins kaufen?`)) {
               totalCoins -= skin.price;
               skin.bought = true;
-              activateSkin(i);
+              activateSkin(idx);
               updateStats();
               renderSkinButtons();
             }
@@ -448,144 +325,143 @@
           }
         }
       });
-
       skinSelector.appendChild(btn);
     });
   }
 
-  // Skin aktivieren - Farben wechseln
-  function activateSkin(index) {
-    skins.forEach((skin, i) => skin.active = i === index);
-    const skin = skins[index];
-    // Update CSS Variablen
+  // Skin aktivieren und Farben setzen
+  function activateSkin(idx) {
+    currentSkinIndex = idx;
+    const skin = skins[idx];
     document.documentElement.style.setProperty('--color-bg', skin.bg);
-    document.documentElement.style.setProperty('--color-accent', skin.border);
-    document.documentElement.style.setProperty('--color-text', skin.accent);
     document.documentElement.style.setProperty('--color-border', skin.border);
-    document.documentElement.style.setProperty('--color-result-win-bg', skin.border + '88');
-    document.documentElement.style.setProperty('--color-result-win-text', skin.accent);
-    document.documentElement.style.setProperty('--color-result-lose-bg', skin.border + '88');
-    document.documentElement.style.setProperty('--color-result-lose-text', skin.border);
-
-    renderSkinButtons();
+    document.documentElement.style.setProperty('--color-accent', skin.accent);
+    // Textfarbe je nach Helligkeit anpassen
+    function getLuminance(hex) {
+      const c = hex.substring(1);
+      const rgb = parseInt(c, 16);
+      const r = (rgb >> 16) & 0xff;
+      const g = (rgb >> 8) & 0xff;
+      const b = rgb & 0xff;
+      return 0.299*r + 0.587*g + 0.114*b;
+    }
+    if(getLuminance(skin.bg) < 128) {
+      document.documentElement.style.setProperty('--color-text', skin.accent);
+    } else {
+      document.documentElement.style.setProperty('--color-text', '#000');
+    }
   }
 
-  // Spiel starten
-  startBtn.addEventListener('click', () => {
-    if(gameStarted) return;
+  // Bot-Strategie nach Schwierigkeitsgrad
+  function botShouldStop(botPoints, playerPoints, difficulty) {
+    let threshold;
+    switch(difficulty) {
+      case 'leicht': threshold = 65; break;
+      case 'mittel': threshold = 75; break;
+      case 'schwer': threshold = 85; break;
+      default: threshold = 75;
+    }
+    // Bot hört auf, wenn er >= threshold hat und >= Spieler oder Spieler überboten
+    if(botPoints >= threshold && botPoints >= playerPoints) return true;
+    if(botPoints > 100) return true; // Verliert wenn über 100
+    return false;
+  }
 
-    const bet = parseInt(betRange.value);
-    if(bet > totalCoins) {
-      alert("Du hast nicht genug Coins für diesen Einsatz!");
+  // Würfeln Funktion
+  function rollDice() {
+    return Math.floor(Math.random() * 10) + 1; // 1 bis 10
+  }
+
+  // Bot Name zufällig
+  function getRandomBotName() {
+    return botNames[Math.floor(Math.random() * botNames.length)];
+  }
+
+  // Spiel Start
+  startBtn.addEventListener('click', () => {
+    if(gameActive) return;
+    if(totalCoins < betRange.value) {
+      alert('Du hast nicht genug Coins für diesen Einsatz.');
       return;
     }
     playerScore = 0;
     botScore = 0;
-    playerStopped = false;
-    gameStarted = true;
-    botName = botNames[Math.floor(Math.random() * botNames.length)];
-    botNameDisplay.textContent = `Gegner: ${botName}`;
-    currentScoreDisplay.textContent = `Deine Punktzahl: 0`;
-    resultMessage.textContent = '';
-    resultMessage.className = '';
-    statusDisplay.textContent = 'Spiel läuft...';
-
-    startBtn.disabled = true;
+    gameActive = true;
+    playerTurn = true;
+    botTurn = false;
     rollBtn.disabled = false;
     stopBtn.disabled = false;
-    betRange.disabled = true;
+    startBtn.disabled = true;
+    resultMessage.textContent = '';
+    resultMessage.className = '';
+    statusDisplay.textContent = 'Dein Zug: Würfle so oft du willst, aber über 100 verlieren!';
+    botNameDisplay.textContent = 'Gegner: ' + getRandomBotName();
+    currentScoreDisplay.textContent = 'Deine Punktzahl: 0';
+    updateStats();
   });
 
-  // Würfeln (Spieler)
+  // Würfeln Klick
   rollBtn.addEventListener('click', () => {
-    if(!gameStarted || playerStopped) return;
-
-    const roll = Math.floor(Math.random() * 20) + 1; // 1-20
-    playerScore += roll;
-    currentScoreDisplay.textContent = `Deine Punktzahl: ${playerScore}`;
-
+    if(!gameActive || !playerTurn) return;
+    let dice = rollDice();
+    playerScore += dice;
+    currentScoreDisplay.textContent = 'Deine Punktzahl: ' + playerScore;
     if(playerScore > 100) {
-      // Direkt verloren wenn über 100
-      endGame(false);
+      endRound(false); // verloren
     }
   });
 
-  // Spieler stoppt, Bot würfelt
+  // Stop Klick
   stopBtn.addEventListener('click', () => {
-    if(!gameStarted || playerStopped) return;
-
-    playerStopped = true;
+    if(!gameActive || !playerTurn) return;
+    playerTurn = false;
     rollBtn.disabled = true;
     stopBtn.disabled = true;
-    statusDisplay.textContent = 'Bot würfelt...';
-
-    setTimeout(() => {
-      botScore = 0;
-      // Bot würfelt solange bis >= 70 oder Bot höher als Spieler
-      while(botScore < 70 || (botScore < playerScore && botScore <= 100)) {
-        botScore += Math.floor(Math.random() * 20) + 1;
-      }
-      statusDisplay.textContent = `Bot hat ${botScore} Punkte.`;
-      // Wer näher an 100?
-      let playerDiff = (playerScore > 100) ? 9999 : 100 - playerScore;
-      let botDiff = (botScore > 100) ? 9999 : 100 - botScore;
-
-      if(playerDiff < botDiff) {
-        endGame(true);
-      } else {
-        endGame(false);
-      }
-    }, 1200);
+    statusDisplay.textContent = 'Bot ist am Würfeln...';
+    botTurn = true;
+    botPlay();
   });
 
-  // Spiel beenden (true = Spieler gewinnt)
-  function endGame(playerWon) {
-    gameStarted = false;
-    startBtn.disabled = false;
+  // Bot Spielzug
+  function botPlay() {
+    const difficulty = difficultySelect.value;
+    let botRoll = rollDice();
+    botScore += botRoll;
+    // Kleine Verzögerung, damit man sieht was passiert
+    setTimeout(() => {
+      if(botScore > 100 || botShouldStop(botScore, playerScore, difficulty)) {
+        botTurn = false;
+        endRound(botScore <= 100 && botScore >= playerScore);
+      } else {
+        botPlay();
+      }
+    }, 700);
+  }
+
+  // Runde beenden, Ergebnis anzeigen
+  function endRound(playerWon) {
+    gameActive = false;
     rollBtn.disabled = true;
     stopBtn.disabled = true;
-    betRange.disabled = false;
+    startBtn.disabled = false;
 
-    const bet = parseInt(betRange.value);
     gamesPlayed++;
     if(playerWon) {
       gamesWon++;
-      totalCoins += bet;
-      resultMessage.textContent = `Gewonnen! +${bet} Coins`;
+      totalCoins += parseInt(betRange.value); // Gewinn = Einsatz
+      resultMessage.textContent = `Gewonnen! +${betRange.value} Coins`;
       resultMessage.className = 'win';
     } else {
       gamesLost++;
-      totalCoins -= bet;
-      if(totalCoins < 0) totalCoins = 0;
-      resultMessage.textContent = `Verloren! -${bet} Coins`;
+      totalCoins -= parseInt(betRange.value);
+      resultMessage.textContent = `Verloren! -${betRange.value} Coins`;
       resultMessage.className = 'lose';
     }
-
     updateStats();
-
-    // Kredit Rückzahlung wenn aktiv
-    if(creditActive) {
-      creditRoundsLeft--;
-      if(creditRoundsLeft <= 0) {
-        const interest = Math.ceil(creditAmount * creditInterestPercent / 100);
-        const totalRepay = creditAmount + interest;
-        if(totalCoins >= totalRepay) {
-          totalCoins -= totalRepay;
-          creditInfo.textContent = `Kredit zurückgezahlt: ${totalRepay} Coins (inkl. ${interest} Zinsen)`;
-          creditActive = false;
-          creditAmount = 0;
-          creditRoundsLeft = 0;
-        } else {
-          creditInfo.textContent = `Kreditfälligkeit! Du hast nicht genug Coins (${totalCoins}) für Rückzahlung (${totalRepay})!`;
-        }
-      } else {
-        creditInfo.textContent = `Kredit läuft: Noch ${creditRoundsLeft} Runde(n) bis Rückzahlung`;
-      }
-      updateStats();
-    }
+    statusDisplay.textContent = `Endstand: Du ${playerScore} - Bot ${botScore}`;
   }
 
-  // Kredit aufnehmen
+  // Kredit Logik
   creditBtn.addEventListener('click', () => {
     if(creditActive) {
       alert('Du hast bereits einen aktiven Kredit!');
@@ -594,44 +470,97 @@
     let creditVal = parseInt(creditInput.value);
     let roundsVal = parseInt(creditRoundsInput.value);
     if(isNaN(creditVal) || isNaN(roundsVal)) {
-      alert('Bitte gib gültige Werte für Kreditbetrag und Rückzahlungsrunden ein.');
+      alert('Bitte gültige Werte für Kredit und Rückzahlung angeben.');
       return;
     }
     if(creditVal < 50 || creditVal > 1000) {
-      alert('Kreditbetrag muss zwischen 1 und 10000 Coins liegen.');
+      alert('Kreditbetrag muss zwischen 50 und 1000 Coins liegen.');
       return;
     }
     if(roundsVal < 1 || roundsVal > 5) {
       alert('Rückzahlung muss zwischen 1 und 5 Runden liegen.');
       return;
     }
-
     creditAmount = creditVal;
     creditRoundsLeft = roundsVal;
     creditActive = true;
-    totalCoins += creditVal;
-    creditInfo.textContent = `Kredit aufgenommen: ${creditVal} Coins, Rückzahlung in ${roundsVal} Runde(n) + 5% Zinsen.`;
+    totalCoins += creditAmount;
+    creditInfo.textContent = `Kredit aufgenommen: ${creditAmount} Coins. Rückzahlung in ${creditRoundsLeft} Runden + 5% Zinsen.`;
     updateStats();
-
-    // Felder zurücksetzen
     creditInput.value = '';
     creditRoundsInput.value = '';
   });
 
-  // Bonus Checkbox
-  bonusToggleCheckbox.addEventListener('change', () => {
-    if(bonusToggleCheckbox.checked) {
-      totalCoins += 100;
-      alert('Täglicher Bonus: +100 Coins gutgeschrieben!');
-      bonusToggleCheckbox.disabled = true;
+  // Kredit Abzug pro Runde
+  function checkCredit() {
+    if(creditActive) {
+      if(creditRoundsLeft <= 0) {
+        const interest = Math.ceil(creditAmount * creditInterestPercent / 100);
+        const repayAmount = creditAmount + interest;
+        if(totalCoins >= repayAmount) {
+          totalCoins -= repayAmount;
+          creditInfo.textContent = `Kredit zurückgezahlt: ${repayAmount} Coins (inkl. ${interest} Zinsen).`;
+          creditActive = false;
+          creditAmount = 0;
+          creditRoundsLeft = 0;
+        } else {
+          creditInfo.textContent = `Kredit fällig! Du hast nur ${totalCoins} Coins, brauchst aber ${repayAmount} Coins.`;
+        }
+      } else {
+        creditRoundsLeft--;
+        creditInfo.textContent = `Kredit läuft: Noch ${creditRoundsLeft} Runde(n) bis Rückzahlung.`;
+      }
       updateStats();
     }
+  }
+
+  // Einsatz ändern
+  betRange.addEventListener('input', () => {
+    betAmountDisplay.textContent = betRange.value;
   });
 
-  // Init
-  updateStats();
+  // Nach jeder Runde Kredit checken
+  function afterRound() {
+    checkCredit();
+  }
+
+  // Spiele Statistik & Kredit in updateStats mit einbauen
+  function updateStats() {
+    totalCoinsDisplay.textContent = totalCoins;
+    gamesPlayedDisplay.textContent = gamesPlayed;
+    gamesWonDisplay.textContent = gamesWon;
+    gamesLostDisplay.textContent = gamesLost;
+  }
+
+  // Runde Ende auch credit checken und UI aktualisieren
+  function endRound(playerWon) {
+    gameActive = false;
+    rollBtn.disabled = true;
+    stopBtn.disabled = true;
+    startBtn.disabled = false;
+
+    gamesPlayed++;
+    if(playerWon) {
+      gamesWon++;
+      totalCoins += parseInt(betRange.value);
+      resultMessage.textContent = `Gewonnen! +${betRange.value} Coins`;
+      resultMessage.className = 'win';
+    } else {
+      gamesLost++;
+      totalCoins -= parseInt(betRange.value);
+      resultMessage.textContent = `Verloren! -${betRange.value} Coins`;
+      resultMessage.className = 'lose';
+    }
+    statusDisplay.textContent = `Endstand: Du ${playerScore} - Bot ${botScore}`;
+    updateStats();
+    afterRound();
+  }
+
+  // Initial Skin Setup
   renderSkinButtons();
   activateSkin(0);
+
+  updateStats();
 })();
 </script>
 
