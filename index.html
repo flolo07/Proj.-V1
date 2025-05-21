@@ -184,7 +184,6 @@
         const p = document.createElement("p");
         p.innerHTML = `<span class="name">${escapeHtml(data.name)}:</span> ${formatMessage(data.text)}`;
 
-        // Nur eigene Nachrichten können gelöscht werden
         if (data.name === username) {
           const delBtn = document.createElement("button");
           delBtn.textContent = "🗑️";
