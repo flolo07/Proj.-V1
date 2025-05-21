@@ -1,462 +1,157 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Coming Soon – Schönes entsteht</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&family=Open+Sans&display=swap');
-
-  /* Reset & Basics */
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-  }
-  body {
-    font-family: 'Open Sans', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-gradient);
-    color: var(--text-color);
-    transition: background 1s ease, color 1s ease;
-    overflow-x: hidden;
-  }
-  :root {
-    --purple: #7f5af0;
-    --purple-dark: #633dcc;
-    --purple-light: #c3b1f7;
-    --text-color: #333;
-    --bg-gradient: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-    --btn-bg: var(--purple);
-    --btn-hover: var(--purple-dark);
-    --content-bg: rgba(255 255 255 / 0.85);
-    --border-color: var(--purple);
-    --shadow-color: rgba(127, 90, 240, 0.3);
-  }
-  .dark {
-    --text-color: #eee;
-    --bg-gradient: linear-gradient(135deg, #2c3e50, #4ca1af);
-    --btn-bg: #4ca1af;
-    --btn-hover: #357a91;
-    --content-bg: rgba(44 62 80 / 0.85);
-    --border-color: #4ca1af;
-    --shadow-color: rgba(76, 161, 175, 0.5);
-  }
-
-  /* Loader */
-  #loader {
-    position: fixed;
-    top: 0; left: 0; right:0; bottom:0;
-    background: var(--bg-gradient);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-  }
-  .lds-ring {
-    display: inline-block;
-    position: relative;
-    width: 80px;
-    height: 80px;
-  }
-  .lds-ring div {
-    box-sizing: border-box;
-    display: block;
-    position: absolute;
-    width: 64px;
-    height: 64px;
-    margin: 8px;
-    border: 8px solid var(--purple);
-    border-radius: 50%;
-    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: var(--purple) transparent transparent transparent;
-  }
-  .lds-ring div:nth-child(1) { animation-delay: -0.45s; }
-  .lds-ring div:nth-child(2) { animation-delay: -0.3s; }
-  .lds-ring div:nth-child(3) { animation-delay: -0.15s; }
-  @keyframes lds-ring {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(360deg);}
-  }
-
-  /* Container */
-  main {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem 4rem;
-    position: relative;
-    max-width: 800px;
-    margin: auto;
-    z-index: 10;
-  }
-
-  /* Parallax SVG background */
-  #svg-bg {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  /* Content Box */
-  .content {
-    background: var(--content-bg);
-    border: 3px solid var(--border-color);
-    border-radius: 20px;
-    box-shadow: 0 8px 30px var(--shadow-color);
-    padding: 40px 30px;
-    text-align: center;
-    width: 100%;
-    max-width: 700px;
-    animation: fadeIn 2s ease forwards;
-    opacity: 0;
-  }
-
-  @keyframes fadeIn {
-    to {opacity:1;}
-  }
-
-  h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    margin-bottom: 1rem;
-    color: var(--border-color);
-    letter-spacing: 0.05em;
-  }
-  p {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    color: var(--text-color);
-    line-height: 1.6;
-    margin-bottom: 1rem;
-  }
-  .highlight {
-    color: var(--btn-bg);
-    font-weight: 600;
-    position: relative;
-    overflow: hidden;
-  }
-  .highlight::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 3px;
-    bottom: 0;
-    left: -100%;
-    background: var(--btn-bg);
-    animation: slideUnderline 3s linear infinite;
-  }
-  @keyframes slideUnderline {
-    0% { left: -100%; }
-    50% { left: 0; }
-    100% { left: 100%; }
-  }
-
-  footer {
-    margin-top: 2rem;
-    font-size: 0.9rem;
-    color: var(--text-color);
-  }
-
-  /* Buttons */
-  .btn-container {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-    gap: 18px;
-    flex-wrap: wrap;
-  }
-  button {
-    background: var(--btn-bg);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 12px;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 5px 20px rgba(127, 90, 240, 0.6);
-    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    user-select: none;
-    position: relative;
-    overflow: hidden;
-  }
-  button:hover {
-    background: var(--btn-hover);
-    transform: scale(1.1);
-    box-shadow: 0 8px 30px rgba(127, 90, 240, 0.8);
-  }
-  button:active {
-    transform: scale(0.95);
-  }
-  button:focus-visible {
-    outline: 3px solid var(--btn-hover);
-    outline-offset: 3px;
-  }
-  button::after {
-    content: "";
-    position: absolute;
-    border-radius: 50%;
-    width: 100%;
-    height: 100%;
-    top: 0; left: 0;
-    pointer-events: none;
-    transform: scale(0);
-    background: rgba(255 255 255 / 0.3);
-    transition: transform 0.4s ease, opacity 0.8s ease;
-    opacity: 0;
-  }
-  button:active::after {
-    transform: scale(2);
-    opacity: 1;
-    transition: 0s;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    main {
-      padding: 1rem;
-    }
-    .content {
-      padding: 30px 20px;
-    }
-    .btn-container {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatroom v1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(120deg, #ece9e6, #ffffff);
+      display: flex;
       flex-direction: column;
-      gap: 12px;
+      align-items: center;
+      padding: 40px;
     }
-  }
 
-  /* Dark mode toggle button */
-  #mode-toggle {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    background: transparent;
-    border: 2px solid var(--btn-bg);
-    color: var(--btn-bg);
-    padding: 8px 14px;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    z-index: 20;
-    transition: background 0.3s ease, color 0.3s ease;
-  }
-  #mode-toggle:hover {
-    background: var(--btn-bg);
-    color: white;
-  }
+    #login, #chat {
+      max-width: 600px;
+      width: 100%;
+      margin-top: 20px;
+    }
 
-  /* Contact form */
-  form {
-    margin-top: 2rem;
-    text-align: left;
-  }
-  label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-    color: var(--btn-bg);
-  }
-  input, textarea {
-    width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 15px;
-    border: 2px solid var(--btn-bg);
-    border-radius: 8px;
-    font-size: 1rem;
-    background: transparent;
-    color: var(--text-color);
-    resize: vertical;
-    transition: border-color 0.3s ease;
-  }
-  input:focus, textarea:focus {
-    outline: none;
-    border-color: var(--btn-hover);
-  }
-  form button {
-    width: auto;
-    display: block;
-    margin-top: 0;
-  }
+    input, button {
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
 
-  /* Parallax floating circles */
-  #svg-bg circle {
-    animation: floatParallax 10s ease-in-out infinite;
-  }
-  #svg-bg circle:nth-child(1) {
-    animation-delay: 0s;
-  }
-  #svg-bg circle:nth-child(2) {
-    animation-delay: 3s;
-  }
-  #svg-bg circle:nth-child(3) {
-    animation-delay: 6s;
-  }
-  @keyframes floatParallax {
-    0%, 100% { cy: 50%; opacity: 0.4; }
-    50% { cy: 45%; opacity: 0.8; }
-  }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
 
-  /* Social Icons container */
-  .socials {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-  }
-  .socials a {
-    color: var(--btn-bg);
-    font-size: 1.8rem;
-    transition: color 0.3s ease;
-  }
-  .socials a:hover, .socials a:focus {
-    color: var(--btn-hover);
-  }
+    #messages {
+      height: 300px;
+      overflow-y: scroll;
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 20px;
+    }
 
-  /* Audio control button */
-  #audio-control {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    background: var(--btn-bg);
-    border: none;
-    color: white;
-    padding: 10px 14px;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: 700;
-    box-shadow: 0 5px 15px var(--shadow-color);
-    z-index: 20;
-    transition: background 0.3s ease;
-  }
-  #audio-control:hover {
-    background: var(--btn-hover);
-  }
+    #messages p {
+      margin: 6px 0;
+    }
 
-</style>
+    #messages p span {
+      font-weight: bold;
+      color: #333;
+    }
+
+    #inputForm {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    #chat {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-<div id="loader" aria-label="Ladeanimation">
-  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-</div>
 
-<button id="mode-toggle" aria-pressed="false" aria-label="Dark Mode umschalten">🌙</button>
+  <h1>💬 Chatroom v1</h1>
 
-<svg id="svg-bg" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-  <circle cx="20" cy="50" r="10" fill="var(--purple-light)" />
-  <circle cx="50" cy="50" r="15" fill="var(--purple)" />
-  <circle cx="80" cy="50" r="12" fill="var(--purple-dark)" />
-</svg>
-
-<main role="main" id="content" tabindex="-1" aria-live="polite" aria-label="Seiteninhalt">
-  <div class="content">
-    <h1>Hier entsteht bald etwas <span class="highlight">Wundervolles</span></h1>
-    <p>In naher Zukunft werden hier einige <em>fantastische Texte</em> erscheinen, die Geschichten erzählen, inspirieren und begeistern.</p>
-    <p>Bis dahin genieße einfach diese schicke Vorschau mit hübschen Formen, Animationen und interaktiven Knöpfen.</p>
-    
-    <div class="btn-container" role="group" aria-label="Interaktive Buttons">
-      <button id="btn-alert" aria-describedby="alert-desc">Sag Hallo</button>
-      <button id="btn-color" aria-describedby="color-desc">Farben ändern</button>
-      <button id="btn-reset" aria-describedby="reset-desc">Zurücksetzen</button>
-    </div>
-
-    <form id="contact-form" aria-label="Kontaktformular">
-      <label for="name">Dein Name</label>
-      <input type="text" id="name" name="name" placeholder="Max Mustermann" required />
-      <label for="message">Nachricht</label>
-      <textarea id="message" name="message" rows="3" placeholder="Schreibe hier..." required></textarea>
-      <button type="submit">Absenden</button>
-    </form>
-
-    <div class="socials" aria-label="Soziale Netzwerke">
-      <a href="#" title="Twitter" aria-label="Twitter" tabindex="0" role="link" target="_blank" rel="noopener noreferrer">🐦</a>
-      <a href="#" title="Instagram" aria-label="Instagram" tabindex="0" role="link" target="_blank" rel="noopener noreferrer">📸</a>
-      <a href="#" title="GitHub" aria-label="GitHub" tabindex="0" role="link" target="_blank" rel="noopener noreferrer">🐱</a>
-    </div>
+  <div id="login">
+    <input type="text" id="username" placeholder="Dein Name" />
+    <button id="startChat">Betreten</button>
   </div>
-</main>
 
-<button id="audio-control" aria-pressed="false" aria-label="Audio abspielen oder pausieren">🔈</button>
+  <div id="chat">
+    <div id="messages" aria-live="polite"></div>
+    <form id="inputForm">
+      <input type="text" id="messageInput" placeholder="Nachricht schreiben..." required />
+      <button type="submit">Senden</button>
+    </form>
+  </div>
 
-<audio id="background-audio" loop>
-  <source src="https://cdn.pixabay.com/download/audio/2022/03/25/audio_b6f0d1f2f0.mp3?filename=calm-meditation-10803.mp3" type="audio/mpeg" />
-</audio>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<script>
-  // Loader ausblenden
-  window.addEventListener('load', () => {
-    setTimeout(() => {
-      document.getElementById('loader').style.display = 'none';
-      const content = document.getElementById('content');
-      content.style.display = 'flex';
-      content.focus();
-      content.style.flexDirection = 'column';
-      content.style.alignItems = 'center';
-    }, 1500);
-  });
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBk90QZ5OU5Y6oI0t7vJaapBFbbj75hINI",
+      authDomain: "chatroom-v1-593d5.firebaseapp.com",
+      databaseURL: "https://chatroom-v1-593d5-default-rtdb.firebaseio.com",
+      projectId: "chatroom-v1-593d5",
+      storageBucket: "chatroom-v1-593d5.firebasestorage.app",
+      messagingSenderId: "896893640100",
+      appId: "1:896893640100:web:541435187c8ab13ce2b531",
+      measurementId: "G-2SDN322ZSE"
+    };
 
-  // Dark Mode Toggle
-  const modeToggle = document.getElementById('mode-toggle');
-  modeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    modeToggle.setAttribute('aria-pressed', isDark.toString());
-    modeToggle.textContent = isDark ? '☀️' : '🌙';
-  });
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-  // Buttons Aktionen
-  const btnAlert = document.getElementById('btn-alert');
-  const btnColor = document.getElementById('btn-color');
-  const btnReset = document.getElementById('btn-reset');
-  const contentBox = document.querySelector('.content');
-  let originalBg = getComputedStyle(document.body).getPropertyValue('--bg-gradient').trim();
+    let username = "";
 
-  btnAlert.addEventListener('click', () => {
-    alert('Hallo! Danke, dass du hier vorbeischaust 😊');
-  });
+    const loginDiv = document.getElementById("login");
+    const chatDiv = document.getElementById("chat");
+    const usernameInput = document.getElementById("username");
+    const startChat = document.getElementById("startChat");
+    const messageInput = document.getElementById("messageInput");
+    const inputForm = document.getElementById("inputForm");
+    const messagesDiv = document.getElementById("messages");
 
-  btnColor.addEventListener('click', () => {
-    // Zufällige Farbe
-    const colors = ['#7f5af0', '#ff6f61', '#6bcfbb', '#f5a623', '#50e3c2'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    document.body.style.setProperty('--bg-gradient', `linear-gradient(135deg, ${randomColor}, #c3cfe2)`);
-    contentBox.style.borderColor = randomColor;
-    contentBox.style.boxShadow = `0 8px 30px ${randomColor}80`;
-  });
+    startChat.addEventListener("click", () => {
+      username = usernameInput.value.trim();
+      if (!username) {
+        alert("Bitte gib deinen Namen ein.");
+        return;
+      }
+      loginDiv.style.display = "none";
+      chatDiv.style.display = "block";
+      listenForMessages();
+    });
 
-  btnReset.addEventListener('click', () => {
-    document.body.style.setProperty('--bg-gradient', originalBg);
-    contentBox.style.borderColor = 'var(--border-color)';
-    contentBox.style.boxShadow = '0 8px 30px var(--shadow-color)';
-  });
+    inputForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const text = messageInput.value.trim();
+      if (text) {
+        db.ref("messages").push({
+          name: username,
+          text: text,
+          timestamp: Date.now()
+        });
+        messageInput.value = "";
+      }
+    });
 
-  // Kontaktformular (Fake Submit)
-  const form = document.getElementById('contact-form');
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    alert(`Danke für deine Nachricht, ${form.name.value}!`);
-    form.reset();
-  });
+    function listenForMessages() {
+      const messagesRef = db.ref("messages");
+      messagesRef.off(); // remove old listeners
 
-  // Audio Controls
-  const audio = document.getElementById('background-audio');
-  const audioControl = document.getElementById('audio-control');
-
-  audioControl.addEventListener('click', () => {
-    if(audio.paused) {
-      audio.play();
-      audioControl.setAttribute('aria-pressed', 'true');
-      audioControl.textContent = '🔊';
-    } else {
-      audio.pause();
-      audioControl.setAttribute('aria-pressed', 'false');
-      audioControl.textContent = '🔈';
+      messagesRef.limitToLast(100).on("child_added", (snapshot) => {
+        const data = snapshot.val();
+        const p = document.createElement("p");
+        p.innerHTML = `<span>${escapeHtml(data.name)}:</span> ${escapeHtml(data.text)}`;
+        messagesDiv.appendChild(p);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      });
     }
-  });
-</script>
 
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
 </body>
 </html>
