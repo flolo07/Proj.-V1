@@ -42,6 +42,7 @@
     flex-direction: column;
     gap: 15px;
     position: relative;
+    border: 3px solid var(--color-border);
   }
 
   h1 {
@@ -262,153 +263,100 @@
   #stats {
     background-color: #0d120d;
     border-radius: 12px;
-    padding: 15px 20px;
-    box-shadow: 0 0 10px var(--color-accent);
-    font-weight: 600;
-    font-size: 1rem;
+    padding: 12px 15px;
     color: var(--color-text);
+    font-weight: 600;
+    margin-top: 12px;
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  #stats div {
-    min-width: 130px;
-  }
-
-  /* Boni Toggle */
-  #bonusToggleContainer {
-    margin: 12px 0 0 0;
-    text-align: center;
+    justify-content: space-around;
     user-select: none;
   }
-  label.switch {
-    position: relative;
-    display: inline-block;
-    width: 52px;
-    height: 28px;
-  }
-  label.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  label.slider {
-    position: absolute;
-    cursor: pointer;
-    background-color: #555;
-    border-radius: 28px;
-    top: 0; left: 0; right: 0; bottom: 0;
-    transition: 0.4s;
-  }
-  label.slider:before {
-    position: absolute;
-    content: "";
-    height: 22px;
-    width: 22px;
-    left: 3px;
-    bottom: 3px;
-    background-color: #fff;
-    border-radius: 50%;
-    transition: 0.4s;
-  }
-  input:checked + label.slider {
-    background-color: var(--color-accent);
-  }
-  input:checked + label.slider:before {
-    transform: translateX(24px);
-  }
-  #bonusToggleLabel {
-    margin-left: 8px;
-    font-weight: 700;
-    color: var(--color-accent);
-    vertical-align: middle;
-  }
 
+  /* Bonus Toggle */
+  #bonusToggleContainer {
+    margin-top: 12px;
+    user-select: none;
+    text-align: center;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+  #bonusToggleCheckbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
 </style>
 </head>
 <body>
-  <div id="gameContainer" class="skin1">
 
-    <h1>🎲 Würfelspiel gegen Bot</h1>
+<div id="gameContainer">
+  <h1>Würfelspiel</h1>
 
-    <!-- Skin-Auswahl -->
-    <div id="skinSelector">
-      <!-- Die Skins werden dynamisch hinzugefügt -->
-    </div>
+  <!-- Skin Auswahl -->
+  <div id="skinSelector" title="Skins auswählen oder kaufen"></div>
 
-    <!-- Einsatz -->
-    <div id="betSection">
-      <label for="betRange">Einsatz: <span id="betAmount">10</span> Coins</label>
-      <input type="range" id="betRange" min="1" max="100" value="10" />
-    </div>
-
-    <!-- Aktuelle Punktzahl -->
-    <div id="currentScore">Deine Punktzahl: 0</div>
-
-    <!-- Ergebnis -->
-    <div id="resultMessage"></div>
-
-    <!-- Spiel Buttons -->
-    <div id="buttons">
-      <button id="startBtn">Start</button>
-      <button id="rollBtn" disabled>Würfeln</button>
-      <button id="stopBtn" disabled>Stop</button>
-    </div>
-
-    <!-- Status und Bot Name -->
-    <div id="status"></div>
-    <div id="botName"></div>
-
-    <!-- Kredit -->
-    <div id="creditSection">
-      <label for="creditInput">Kredit (Coins leihen):</label><br />
-      <input type="number" id="creditInput" min="1" max="1000" placeholder="z.B. 100" />
-      <input type="number" id="creditRounds" min="1" max="10" placeholder="Runden bis Rückzahlung" />
-      <button id="creditBtn">Kredit aufnehmen</button>
-      <div id="creditInfo" style="font-size:0.9rem; margin-top: 6px;"></div>
-    </div>
-
-    <!-- Statistiken -->
-    <div id="stats">
-      <div>Gesamt-Coins: <span id="totalCoins">500</span></div>
-      <div>Spiele gespielt: <span id="gamesPlayed">0</span></div>
-      <div>Gewonnen: <span id="gamesWon">0</span></div>
-      <div>Verloren: <span id="gamesLost">0</span></div>
-    </div>
-
-    <!-- Täglicher Bonus -->
-    <div id="bonusToggleContainer">
-      <input type="checkbox" id="bonusToggle" />
-      <label for="bonusToggle" class="switch">
-        <input type="checkbox" id="bonusToggleCheckbox" />
-        <label for="bonusToggleCheckbox" class="slider"></label>
-      </label>
-      <span id="bonusToggleLabel">Täglicher Bonus (100 Coins)</span>
-    </div>
-
+  <!-- Einsatz -->
+  <div id="betSection">
+    <label for="betRange">Einsatz wählen (Coins):</label>
+    <input type="range" id="betRange" min="10" max="500" value="10" step="10" />
+    <div id="betAmount">10</div>
   </div>
+
+  <!-- Punkteanzeige -->
+  <div id="currentScore">Deine Punktzahl: 0</div>
+  <div id="resultMessage"></div>
+
+  <div id="buttons">
+    <button id="startBtn">Spiel starten</button>
+    <button id="rollBtn" disabled>Würfeln</button>
+    <button id="stopBtn" disabled>Stop</button>
+  </div>
+
+  <div id="status"></div>
+  <div id="botName"></div>
+
+  <!-- Kreditaufnahme -->
+  <div id="creditSection">
+    <label for="creditInput">Kreditbetrag aufnehmen (max. 1000 Coins):</label><br />
+    <input type="number" id="creditInput" min="50" max="1000" step="50" placeholder="50 - 1000 Coins" />
+    <input type="number" id="creditRounds" min="1" max="5" step="1" placeholder="Rückzahlung in Runden (1-5)" />
+    <button id="creditBtn">Kredit aufnehmen</button>
+    <div id="creditInfo"></div>
+  </div>
+
+  <!-- Statistiken -->
+  <div id="stats">
+    <div>Coins: <span id="totalCoins">500</span></div>
+    <div>Spiele: <span id="gamesPlayed">0</span></div>
+    <div>Gewonnen: <span id="gamesWon">0</span></div>
+    <div>Verloren: <span id="gamesLost">0</span></div>
+  </div>
+
+  <!-- Bonus -->
+  <div id="bonusToggleContainer">
+    <input type="checkbox" id="bonusToggleCheckbox" />
+    <label for="bonusToggleCheckbox">Täglicher Bonus (+100 Coins)</label>
+  </div>
+</div>
 
 <script>
 (() => {
-  // Initiale Werte
+  // --- Initialwerte ---
   let totalCoins = 500;
   let gamesPlayed = 0;
   let gamesWon = 0;
   let gamesLost = 0;
 
-  // Kredit-Daten
   let creditAmount = 0;
   let creditRoundsLeft = 0;
-  let creditRoundsTotal = 0;
-  let creditInterestPercent = 5; // 5% Zinsen auf Kreditbetrag
+  const creditInterestPercent = 5; // 5% Zinsen
   let creditActive = false;
 
-  // Bot Namen
   const botNames = ['Luna', 'Max', 'Rex', 'Siri', 'Nero', 'Ava', 'Milo', 'Juno', 'Zara', 'Kian'];
-  let botName = botNames[Math.floor(Math.random() * botNames.length)];
 
-  // Skins: id, Farben (bg, border, accent), Preis, gekauft?, aktiv?
+  // Skins mit Farben und Preisen
   const skins = [
     {id: 'skin1', name: 'Grün Classic', bg: '#121a12', border: '#4caf50', accent: '#adebad', price: 0, bought: true, active: true},
     {id: 'skin2', name: 'Rot Modern', bg: '#2f0f0f', border: '#c62828', accent: '#ff6f6f', price: 150, bought: false, active: false},
@@ -420,7 +368,7 @@
     {id: 'skin8', name: 'Dunkel Rot', bg: '#210b0b', border: '#d32f2f', accent: '#ff5c5c', price: 110, bought: false, active: false}
   ];
 
-  // DOM Elemente
+  // DOM-Elemente
   const gameContainer = document.getElementById('gameContainer');
   const skinSelector = document.getElementById('skinSelector');
   const betRange = document.getElementById('betRange');
@@ -440,24 +388,42 @@
   const creditRoundsInput = document.getElementById('creditRounds');
   const creditBtn = document.getElementById('creditBtn');
   const creditInfo = document.getElementById('creditInfo');
-  const bonusToggle = document.getElementById('bonusToggleCheckbox');
+  const bonusToggleCheckbox = document.getElementById('bonusToggleCheckbox');
 
+  // Spielstatus
   let playerScore = 0;
   let botScore = 0;
   let gameStarted = false;
   let playerStopped = false;
+  let botName = '';
 
-  // Initialize Skin Buttons
+  // Update Anzeige aller Statistiken
+  function updateStats() {
+    totalCoinsDisplay.textContent = totalCoins;
+    gamesPlayedDisplay.textContent = gamesPlayed;
+    gamesWonDisplay.textContent = gamesWon;
+    gamesLostDisplay.textContent = gamesLost;
+  }
+
+  // Update Einsatz-Anzeige
+  betAmountDisplay.textContent = betRange.value;
+  betRange.max = totalCoins < 10 ? 10 : totalCoins; // max ist mind. 10
+
+  betRange.addEventListener('input', () => {
+    betAmountDisplay.textContent = betRange.value;
+  });
+
+  // Skin Buttons rendern
   function renderSkinButtons() {
     skinSelector.innerHTML = '';
     skins.forEach((skin, i) => {
       const btn = document.createElement('div');
       btn.classList.add('skinButton');
       btn.classList.add(`skin${i+1}Btn`);
-      if(skin.active) btn.classList.add('active');
       btn.title = `${skin.name}\nPreis: ${skin.price} Coins\n${skin.bought ? 'Gekauft' : 'Nicht gekauft'}`;
+      if(skin.active) btn.classList.add('active');
 
-      // Preis Tag
+      // Preis-Tag wenn nicht gekauft
       if(!skin.bought && skin.price > 0) {
         const priceTag = document.createElement('div');
         priceTag.classList.add('skinPriceTag');
@@ -487,19 +453,16 @@
     });
   }
 
+  // Skin aktivieren - Farben wechseln
   function activateSkin(index) {
     skins.forEach((skin, i) => skin.active = i === index);
     const skin = skins[index];
-    gameContainer.style.backgroundColor = skin.bg;
-    gameContainer.style.borderColor = skin.border;
-    gameContainer.style.color = skin.accent;
-    gameContainer.style.boxShadow = `0 0 20px ${skin.accent}`;
-    // Update CSS vars for accent color for other elements
+    // Update CSS Variablen
     document.documentElement.style.setProperty('--color-bg', skin.bg);
-    document.documentElement.style.setProperty('--color-accent', skin.accent);
+    document.documentElement.style.setProperty('--color-accent', skin.border);
     document.documentElement.style.setProperty('--color-text', skin.accent);
     document.documentElement.style.setProperty('--color-border', skin.border);
-    document.documentElement.style.setProperty('--color-result-win-bg', skin.border + '88'); // transparent border color
+    document.documentElement.style.setProperty('--color-result-win-bg', skin.border + '88');
     document.documentElement.style.setProperty('--color-result-win-text', skin.accent);
     document.documentElement.style.setProperty('--color-result-lose-bg', skin.border + '88');
     document.documentElement.style.setProperty('--color-result-lose-text', skin.border);
@@ -507,33 +470,170 @@
     renderSkinButtons();
   }
 
-  // Update Stats on screen
-  function updateStats() {
-    totalCoinsDisplay.textContent = totalCoins;
-    gamesPlayedDisplay.textContent = gamesPlayed;
-    gamesWonDisplay.textContent = gamesWon;
-    gamesLostDisplay.textContent = gamesLost;
-  }
-
-  // Update Bet display
-  betAmountDisplay.textContent = betRange.value;
-
-  betRange.addEventListener('input', () => {
-    betAmountDisplay.textContent = betRange.value;
-  });
-
-  // Start neues Spiel
+  // Spiel starten
   startBtn.addEventListener('click', () => {
-    if (gameStarted) return;
+    if(gameStarted) return;
+
     const bet = parseInt(betRange.value);
     if(bet > totalCoins) {
       alert("Du hast nicht genug Coins für diesen Einsatz!");
       return;
     }
-
     playerScore = 0;
     botScore = 0;
     playerStopped = false;
     gameStarted = true;
     botName = botNames[Math.floor(Math.random() * botNames.length)];
-    botName
+    botNameDisplay.textContent = `Gegner: ${botName}`;
+    currentScoreDisplay.textContent = `Deine Punktzahl: 0`;
+    resultMessage.textContent = '';
+    resultMessage.className = '';
+    statusDisplay.textContent = 'Spiel läuft...';
+
+    startBtn.disabled = true;
+    rollBtn.disabled = false;
+    stopBtn.disabled = false;
+    betRange.disabled = true;
+  });
+
+  // Würfeln (Spieler)
+  rollBtn.addEventListener('click', () => {
+    if(!gameStarted || playerStopped) return;
+
+    const roll = Math.floor(Math.random() * 20) + 1; // 1-20
+    playerScore += roll;
+    currentScoreDisplay.textContent = `Deine Punktzahl: ${playerScore}`;
+
+    if(playerScore > 100) {
+      // Direkt verloren wenn über 100
+      endGame(false);
+    }
+  });
+
+  // Spieler stoppt, Bot würfelt
+  stopBtn.addEventListener('click', () => {
+    if(!gameStarted || playerStopped) return;
+
+    playerStopped = true;
+    rollBtn.disabled = true;
+    stopBtn.disabled = true;
+    statusDisplay.textContent = 'Bot würfelt...';
+
+    setTimeout(() => {
+      botScore = 0;
+      // Bot würfelt solange bis >= 70 oder Bot höher als Spieler
+      while(botScore < 70 || (botScore < playerScore && botScore <= 100)) {
+        botScore += Math.floor(Math.random() * 20) + 1;
+      }
+      statusDisplay.textContent = `Bot hat ${botScore} Punkte.`;
+      // Wer näher an 100?
+      let playerDiff = (playerScore > 100) ? 9999 : 100 - playerScore;
+      let botDiff = (botScore > 100) ? 9999 : 100 - botScore;
+
+      if(playerDiff < botDiff) {
+        endGame(true);
+      } else {
+        endGame(false);
+      }
+    }, 1200);
+  });
+
+  // Spiel beenden (true = Spieler gewinnt)
+  function endGame(playerWon) {
+    gameStarted = false;
+    startBtn.disabled = false;
+    rollBtn.disabled = true;
+    stopBtn.disabled = true;
+    betRange.disabled = false;
+
+    const bet = parseInt(betRange.value);
+    gamesPlayed++;
+    if(playerWon) {
+      gamesWon++;
+      totalCoins += bet;
+      resultMessage.textContent = `Gewonnen! +${bet} Coins`;
+      resultMessage.className = 'win';
+    } else {
+      gamesLost++;
+      totalCoins -= bet;
+      if(totalCoins < 0) totalCoins = 0;
+      resultMessage.textContent = `Verloren! -${bet} Coins`;
+      resultMessage.className = 'lose';
+    }
+
+    updateStats();
+
+    // Kredit Rückzahlung wenn aktiv
+    if(creditActive) {
+      creditRoundsLeft--;
+      if(creditRoundsLeft <= 0) {
+        const interest = Math.ceil(creditAmount * creditInterestPercent / 100);
+        const totalRepay = creditAmount + interest;
+        if(totalCoins >= totalRepay) {
+          totalCoins -= totalRepay;
+          creditInfo.textContent = `Kredit zurückgezahlt: ${totalRepay} Coins (inkl. ${interest} Zinsen)`;
+          creditActive = false;
+          creditAmount = 0;
+          creditRoundsLeft = 0;
+        } else {
+          creditInfo.textContent = `Kreditfälligkeit! Du hast nicht genug Coins (${totalCoins}) für Rückzahlung (${totalRepay})!`;
+        }
+      } else {
+        creditInfo.textContent = `Kredit läuft: Noch ${creditRoundsLeft} Runde(n) bis Rückzahlung`;
+      }
+      updateStats();
+    }
+  }
+
+  // Kredit aufnehmen
+  creditBtn.addEventListener('click', () => {
+    if(creditActive) {
+      alert('Du hast bereits einen aktiven Kredit!');
+      return;
+    }
+    let creditVal = parseInt(creditInput.value);
+    let roundsVal = parseInt(creditRoundsInput.value);
+    if(isNaN(creditVal) || isNaN(roundsVal)) {
+      alert('Bitte gib gültige Werte für Kreditbetrag und Rückzahlungsrunden ein.');
+      return;
+    }
+    if(creditVal < 50 || creditVal > 1000) {
+      alert('Kreditbetrag muss zwischen 1 und 10000 Coins liegen.');
+      return;
+    }
+    if(roundsVal < 1 || roundsVal > 5) {
+      alert('Rückzahlung muss zwischen 1 und 5 Runden liegen.');
+      return;
+    }
+
+    creditAmount = creditVal;
+    creditRoundsLeft = roundsVal;
+    creditActive = true;
+    totalCoins += creditVal;
+    creditInfo.textContent = `Kredit aufgenommen: ${creditVal} Coins, Rückzahlung in ${roundsVal} Runde(n) + 5% Zinsen.`;
+    updateStats();
+
+    // Felder zurücksetzen
+    creditInput.value = '';
+    creditRoundsInput.value = '';
+  });
+
+  // Bonus Checkbox
+  bonusToggleCheckbox.addEventListener('change', () => {
+    if(bonusToggleCheckbox.checked) {
+      totalCoins += 100;
+      alert('Täglicher Bonus: +100 Coins gutgeschrieben!');
+      bonusToggleCheckbox.disabled = true;
+      updateStats();
+    }
+  });
+
+  // Init
+  updateStats();
+  renderSkinButtons();
+  activateSkin(0);
+})();
+</script>
+
+</body>
+</html>
