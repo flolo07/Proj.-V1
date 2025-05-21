@@ -1,153 +1,378 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coming Soon – Schönes entsteht</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&family=Open+Sans&display=swap');
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Coming Soon – Schönes entsteht</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&family=Open+Sans&display=swap');
 
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-      font-family: 'Open Sans', sans-serif;
-      color: #333;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-      position: relative;
-      transition: background 1s ease;
-    }
+  /* Reset & Basics */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body {
+    font-family: 'Open Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-gradient);
+    color: var(--text-color);
+    transition: background 1s ease, color 1s ease;
+    overflow-x: hidden;
+  }
+  :root {
+    --purple: #7f5af0;
+    --purple-dark: #633dcc;
+    --purple-light: #c3b1f7;
+    --text-color: #333;
+    --bg-gradient: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    --btn-bg: var(--purple);
+    --btn-hover: var(--purple-dark);
+    --content-bg: rgba(255 255 255 / 0.85);
+    --border-color: var(--purple);
+    --shadow-color: rgba(127, 90, 240, 0.3);
+  }
+  .dark {
+    --text-color: #eee;
+    --bg-gradient: linear-gradient(135deg, #2c3e50, #4ca1af);
+    --btn-bg: #4ca1af;
+    --btn-hover: #357a91;
+    --content-bg: rgba(44 62 80 / 0.85);
+    --border-color: #4ca1af;
+    --shadow-color: rgba(76, 161, 175, 0.5);
+  }
 
-    /* Animierte Kreise im Hintergrund, stärker sichtbar */
-    .circle {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(127, 90, 240, 0.3);
-      animation: float 4s ease-in-out infinite;
-      filter: blur(20px);
-      box-shadow: 0 0 40px rgba(127, 90, 240, 0.5);
-    }
-    .circle:nth-child(1) {
-      width: 220px;
-      height: 220px;
-      top: 5%;
-      left: 10%;
-      animation-delay: 0s;
-    }
-    .circle:nth-child(2) {
-      width: 320px;
-      height: 320px;
-      top: 50%;
-      left: 65%;
-      animation-delay: 1.5s;
-    }
-    .circle:nth-child(3) {
-      width: 170px;
-      height: 170px;
-      top: 75%;
-      left: 40%;
-      animation-delay: 3s;
-    }
+  /* Loader */
+  #loader {
+    position: fixed;
+    top: 0; left: 0; right:0; bottom:0;
+    background: var(--bg-gradient);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  .lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+  .lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border: 8px solid var(--purple);
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: var(--purple) transparent transparent transparent;
+  }
+  .lds-ring div:nth-child(1) { animation-delay: -0.45s; }
+  .lds-ring div:nth-child(2) { animation-delay: -0.3s; }
+  .lds-ring div:nth-child(3) { animation-delay: -0.15s; }
+  @keyframes lds-ring {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+  }
 
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0) scale(1);
-        opacity: 0.3;
-      }
-      50% {
-        transform: translateY(-30px) scale(1.15);
-        opacity: 0.6;
-      }
-    }
+  /* Container */
+  main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+    position: relative;
+    max-width: 800px;
+    margin: auto;
+    z-index: 10;
+  }
 
-    /* Text Container mit Rahmen und Fade-in */
+  /* Parallax SVG background */
+  #svg-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Content Box */
+  .content {
+    background: var(--content-bg);
+    border: 3px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px var(--shadow-color);
+    padding: 40px 30px;
+    text-align: center;
+    width: 100%;
+    max-width: 700px;
+    animation: fadeIn 2s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeIn {
+    to {opacity:1;}
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: 1rem;
+    color: var(--border-color);
+    letter-spacing: 0.05em;
+  }
+  p {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  .highlight {
+    color: var(--btn-bg);
+    font-weight: 600;
+  }
+
+  footer {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+  }
+
+  /* Buttons */
+  .btn-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--btn-bg);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(127, 90, 240, 0.6);
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  button:hover {
+    background: var(--btn-hover);
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(127, 90, 240, 0.8);
+  }
+  button:active {
+    transform: scale(0.95);
+  }
+  button:focus-visible {
+    outline: 3px solid var(--btn-hover);
+    outline-offset: 3px;
+  }
+
+  /* Ripple effect on buttons */
+  button::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    top: 0; left: 0;
+    pointer-events: none;
+    transform: scale(0);
+    background: rgba(255 255 255 / 0.3);
+    transition: transform 0.4s ease, opacity 0.8s ease;
+    opacity: 0;
+  }
+  button:active::after {
+    transform: scale(2);
+    opacity: 1;
+    transition: 0s;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    main {
+      padding: 1rem;
+    }
     .content {
-      position: relative;
-      max-width: 650px;
-      background: rgba(255, 255, 255, 0.85);
-      border: 3px solid #7f5af0;
-      border-radius: 15px;
-      padding: 40px 30px;
-      animation: fadeIn 2s ease forwards;
-      opacity: 0;
-      box-shadow: 0 8px 20px rgba(127, 90, 240, 0.3);
-      z-index: 10;
+      padding: 30px 20px;
     }
-
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-      }
-    }
-
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-      color: #4a4a6a;
-    }
-
-    p {
-      font-size: 1.25rem;
-      line-height: 1.6;
-      color: #555;
-      margin-bottom: 1.5rem;
-    }
-
-    .highlight {
-      color: #7f5af0;
-      font-weight: 600;
-    }
-
-    footer {
-      font-size: 0.9rem;
-      color: #999;
-      margin-top: 2rem;
-    }
-
-    /* Button-Styling */
     .btn-container {
-      margin-top: 25px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 12px;
     }
+  }
 
-    button {
-      background: #7f5af0;
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 5px 15px rgba(127, 90, 240, 0.4);
-      transition: background 0.3s ease, transform 0.2s ease;
-    }
+  /* Typo animation */
+  .highlight {
+    position: relative;
+    overflow: hidden;
+  }
+  .highlight::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    bottom: 0;
+    left: -100%;
+    background: var(--btn-bg);
+    animation: slideUnderline 3s linear infinite;
+  }
+  @keyframes slideUnderline {
+    0% { left: -100%; }
+    50% { left: 0; }
+    100% { left: 100%; }
+  }
 
-    button:hover {
-      background: #633dcc;
-      transform: scale(1.05);
-    }
+  /* Dark mode toggle button */
+  #mode-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: 2px solid var(--btn-bg);
+    color: var(--btn-bg);
+    padding: 8px 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    z-index: 20;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  #mode-toggle:hover {
+    background: var(--btn-bg);
+    color: white;
+  }
 
-    button:active {
-      transform: scale(0.95);
-    }
-  </style>
+  /* Contact form */
+  form {
+    margin-top: 2rem;
+    text-align: left;
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--btn-bg);
+  }
+  input, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border: 2px solid var(--btn-bg);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: transparent;
+    color: var(--text-color);
+    resize: vertical;
+    transition: border-color 0.3s ease;
+  }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--btn-hover);
+  }
+  form button {
+    width: auto;
+    display: block;
+    margin-top: 0;
+  }
+
+  /* Parallax scrolling effect for SVG */
+  #svg-bg circle {
+    animation: floatParallax 10s ease-in-out infinite;
+  }
+  #svg-bg circle:nth-child(1) {
+    animation-delay: 0s;
+  }
+  #svg-bg circle:nth-child(2) {
+    animation-delay: 3s;
+  }
+  #svg-bg circle:nth-child(3) {
+    animation-delay: 6s;
+  }
+  @keyframes floatParallax {
+    0%, 100% { cy: 50%; opacity: 0.4; }
+    50% { cy: 45%; opacity: 0.8; }
+  }
+
+  /* Social Icons container */
+  .socials {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+  }
+  .socials a {
+    color: var(--btn-bg);
+    font-size: 1.8rem;
+    transition: color 0.3s ease;
+  }
+  .socials a:hover, .socials a:focus {
+    color: var(--btn-hover);
+  }
+
+  /* Audio control button */
+  #audio-control {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: var(--btn-bg);
+    border: none;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    z-index: 20;
+    transition: background 0.3s ease;
+  }
+  #audio-control:hover {
+    background: var(--btn-hover);
+  }
+</style>
 </head>
 <body>
-  <div class="circle"></div>
-  <div class="circle"></div>
-  <div class="circle"></div>
+<div id="loader" aria-label="Ladeanimation">
+  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+</div>
 
-  <div class="content">
-    <h1>Hier entsteht bald etwas Schönes</h1>
+<button id="mode-toggle" aria-pressed="false" aria-label="Dark Mode ein-/ausschalten">Dark Mode</button>
+
+<svg id="svg-bg" aria-hidden="true" preserveAspectRatio="xMidYMid meet" viewBox="0 0 100 100" >
+  <circle cx="30" cy="50" r="25" fill="url(#grad1)" />
+  <circle cx="70" cy="50" r="25" fill="url(#grad2)" />
+  <circle cx="50" cy="80" r="20" fill="url(#grad3)" />
+  <defs>
+    <radialGradient id="grad1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7f5af0" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#7f5af0" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="grad2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4ca1af" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#4ca1af" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="grad3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f7971e" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#f7971e" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+</svg>
+
+<main role="main" tabindex="-1">
+  <section class="content" aria-labelledby="heading">
+    <h1 id="heading">Hier entsteht bald etwas Schönes</h1>
     <p>
       Man sagt, der beste Platz für Worte ist dort, wo sie mit Liebe gewoben werden. 
       <span class="highlight">Gedanken, Geschichten und kleine Wunder</span> warten nur darauf, 
@@ -157,28 +382,9 @@
       Bis dahin heißt es: Vorfreude genießen und sich überraschen lassen – denn gute Dinge brauchen ihre Zeit.
     </p>
 
-    <div class="btn-container">
-      <button onclick="alert('Danke für dein Interesse! Hier wird bald mehr passieren.')">Info</button>
-      <button onclick="location.reload()">Neu laden</button>
-      <button onclick="wechselHintergrund()">Hintergrund wechseln</button>
-    </div>
+    <!-- Countdown -->
+    <p aria-live="polite" aria-atomic="true" style="font-weight:700; font-size:1.3rem; margin-bottom: 1.5rem;" id="countdown" title="Countdown bis zum Start"></p>
 
-    <footer>© 2025 Coming Soon</footer>
-  </div>
-
-  <script>
-    const backgrounds = [
-      'linear-gradient(135deg, #f5f7fa, #c3cfe2)',
-      'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
-      'linear-gradient(135deg, #667eea, #764ba2)',
-      'linear-gradient(135deg, #f7971e, #ffd200)'
-    ];
-
-    let currentBg = 0;
-    function wechselHintergrund() {
-      currentBg = (currentBg + 1) % backgrounds.length;
-      document.body.style.background = backgrounds[currentBg];
-    }
-  </script>
-</body>
-</html>
+    <div class="btn-container" role="group" aria-label="Interaktive Buttons">
+      <button type="button" id="info-btn">Info</button>
+      <button type="button" id="
