@@ -2,497 +2,280 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Casino Dice Game mit Kredit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoinGame Royal Edition</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
     body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background-color: #002200;
-      background-image:
-        linear-gradient(45deg, #004400 25%, transparent 25%),
-        linear-gradient(-45deg, #004400 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #004400 75%),
-        linear-gradient(-45deg, transparent 75%, #004400 75%);
-      background-size: 40px 40px;
-      background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
-      color: #a0d080;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
-      user-select: none;
-    }
-
-    .container {
-      background: #0b0b0b;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #3a7d3a;
-      display: flex;
-      padding: 20px;
-      max-width: 900px;
-      width: 100%;
-      gap: 20px;
-      color: #a0d080;
-    }
-
-    .left, .center, .right {
-      background: #111;
-      border: 2px solid #3a7d3a;
-      border-radius: 12px;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    .left, .right {
-      width: 180px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      font-size: 0.9rem;
-      color: #a0d080;
-    }
-
-    .center {
-      flex-grow: 1;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: repeating-linear-gradient(45deg, #1f1f1f, #1f1f1f 20px, #2b2b2b 20px, #2b2b2b 40px);
+      color: #e2ffe2;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-      color: #a0d080;
+      padding: 40px;
     }
-
-    h1 {
-      margin: 0 0 10px 0;
-      font-weight: 700;
-      text-align: center;
-      color: #a0d080;
-      text-shadow: 0 0 6px #2f6f2f;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 700;
-    }
-
-    input[type="number"] {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid #3a7d3a;
-      background: #222;
-      color: #a0d080;
-      font-size: 1rem;
-      outline-offset: 2px;
-      outline-color: #2f6f2f;
-    }
-
-    button {
-      background: #3a7d3a;
-      border: none;
-      padding: 12px;
+    .box {
+      background-color: #003300;
+      border: 2px solid gold;
       border-radius: 12px;
-      color: #000;
-      font-weight: 700;
+      padding: 20px;
+      margin: 20px;
+      width: 320px;
+      box-shadow: 0 0 20px gold;
+    }
+    h1, h2 {
+      color: gold;
+    }
+    button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 10px;
+      border: none;
+      background-color: #009900;
+      color: white;
       font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.25s ease, transform 0.15s ease;
-      user-select: none;
+      transition: 0.3s;
     }
-
-    button:hover:not(:disabled) {
-      background-color: #5ba85b;
-      transform: scale(1.05);
+    button:hover {
+      background-color: #00cc00;
     }
-
-    button:disabled {
-      background-color: #444;
-      color: #888;
-      cursor: default;
-      transform: none;
+    input, select {
+      padding: 8px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #555;
     }
-
-    #scoreboard {
-      background: #222;
-      border-radius: 10px;
-      padding: 10px;
-      height: 220px;
-      overflow-y: auto;
-      font-size: 0.9rem;
-      color: #a0d080;
-      box-shadow: inset 0 0 10px #3a7d3a;
-    }
-
-    #scoreboard h2 {
-      margin-top: 0;
-      text-align: center;
-      font-weight: 700;
-      text-shadow: 0 0 5px #2f6f2f;
-    }
-
-    #coinsDisplay, #creditInfo {
-      font-size: 1.1rem;
-      text-align: center;
-      font-weight: 700;
-      margin-top: 10px;
-      min-height: 1.2em;
-      text-shadow: 0 0 6px #2f6f2f;
-    }
-
-    .slider-container {
-      margin-top: 10px;
-      width: 100%;
-    }
-
-    input[type="range"] {
-      width: 100%;
-      -webkit-appearance: none;
-      height: 12px;
-      border-radius: 10px;
-      background: #333;
-      outline: none;
-      cursor: pointer;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #3a7d3a;
-      cursor: pointer;
-      box-shadow: 0 0 8px #5ba85b;
-      transition: background-color 0.25s ease;
-      margin-top: -8px;
-    }
-    input[type="range"]::-webkit-slider-thumb:hover {
-      background-color: #5ba85b;
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #3a7d3a;
-      cursor: pointer;
-      box-shadow: 0 0 8px #5ba85b;
-      transition: background-color 0.25s ease;
-    }
-
-    .btn-group {
+    .flex {
       display: flex;
-      gap: 15px;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-
-    .points-display {
-      font-size: 2.8rem;
-      font-weight: 700;
-      color: #5ba85b;
-      text-shadow: 0 0 8px #3a7d3a;
-      user-select: none;
-      margin: 15px 0;
-    }
-
-    #messageBox {
-      min-height: 3em;
-      font-weight: 700;
-      color: #5ba85b;
-      text-align: center;
-      margin-bottom: 5px;
-      text-shadow: 0 0 5px #3a7d3a;
-      min-height: 40px;
-    }
-
-    .last-games {
-      font-size: 0.9rem;
-      background: #222;
+    .history, .stats, .princess, .shop, .bonus {
+      background: #001a00;
+      border: 1px solid #666;
       border-radius: 10px;
       padding: 10px;
-      height: 120px;
-      overflow-y: auto;
-      box-shadow: inset 0 0 10px #3a7d3a;
-      color: #a0d080;
-      user-select: none;
+      margin-top: 10px;
     }
-
-    .last-games h3 {
-      margin: 0 0 8px 0;
-      text-align: center;
-      font-weight: 700;
-      text-shadow: 0 0 5px #2f6f2f;
+    .skin-toggle {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 3px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
     }
-
-    .last-games p {
-      margin: 2px 0;
-      line-height: 1.3;
+    .skin-toggle.active {
+      border-color: gold;
+      background-color: #004d00;
     }
-
-    /* Scrollbar grün style */
-    .last-games::-webkit-scrollbar {
-      width: 8px;
-    }
-    .last-games::-webkit-scrollbar-thumb {
-      background-color: #3a7d3a;
-      border-radius: 10px;
-    }
-    .last-games::-webkit-scrollbar-track {
-      background: #222;
+    .princess img {
+      width: 100px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <h1>🎲 CoinGame Royal</h1>
 
-    <!-- Kredit links -->
-    <div class="left">
-      <h2>Kredit aufnehmen</h2>
-      <label for="creditAmount">Betrag (Coins)</label>
-      <input type="number" id="creditAmount" min="1" step="1" placeholder="z.B. 100" />
-      <label for="creditRounds">Laufzeit (Runden)</label>
-      <input type="number" id="creditRounds" min="1" max="10" step="1" value="5" />
-      <button id="takeCreditBtn">Kredit aufnehmen</button>
-      <div id="creditInfo"></div>
-    </div>
-
-    <!-- Spiel Mitte -->
-    <div class="center">
-      <h1>🎲 Casino Dice Game</h1>
-      <div id="messageBox">Viel Glück!</div>
-
+  <div class="flex">
+    <div class="box">
+      <h2>Dein Konto</h2>
+      <p>Coins: <span id="coins">1000</span></p>
+      <p>Kredit: <span id="credit">0</span></p>
       <div>
-        <label for="betSlider">Setze deinen Einsatz (Coins): <span id="betAmount">10</span></label>
-        <input type="range" id="betSlider" min="1" max="100" value="10" />
-      </div>
-
-      <div class="points-display" id="playerPoints">0</div>
-
-      <div class="btn-group">
-        <button id="drawBtn">Würfeln</button>
-        <button id="stopBtn" disabled>Stop</button>
-        <button id="startBtn" disabled>Neu starten</button>
-      </div>
-
-      <div class="last-games">
-        <h3>Letzte 5 Spiele</h3>
-        <div id="lastGamesList">Noch keine Spiele...</div>
+        <input type="number" id="creditAmount" placeholder="Kreditbetrag" />
+        <input type="number" id="creditRounds" placeholder="Runden" />
+        <button onclick="takeCredit()">Kredit aufnehmen</button>
       </div>
     </div>
 
-    <!-- Kontostand rechts -->
-    <div class="right">
-      <h2>Kontostand</h2>
-      <div id="coinsDisplay">Coins: 100</div>
+    <div class="box">
+      <h2>Spielrunde</h2>
+      <p>Setze Coins:</p>
+      <input type="range" id="bet" min="1" max="100" value="10" />
+      <span id="betDisplay">10</span>
+      <br />
+      <button onclick="draw()">Würfeln</button>
+      <button onclick="stopGame()">Stoppen</button>
+      <p>Deine Punkte: <span id="playerScore">0</span></p>
+      <p id="botName">Bot:</p>
+      <p>Bot Punkte: <span id="botScore">0</span></p>
+    </div>
+
+    <div class="box history">
+      <h2>Letzte Spiele</h2>
+      <ul id="history"></ul>
+    </div>
+
+    <div class="box stats">
+      <h2>Statistiken</h2>
+      <p>Gewonnen: <span id="won">0</span></p>
+      <p>Verloren: <span id="lost">0</span></p>
+      <p>Letzte Auszahlung: <span id="lastBonus">Nie</span></p>
+    </div>
+
+    <div class="box bonus">
+      <h2>Täglicher Bonus</h2>
+      <button onclick="claimBonus()">100 Coins abholen</button>
+      <p>Nächster Bonus in: <span id="bonusTimer">...</span></p>
+    </div>
+
+    <div class="box shop">
+      <h2>Skins</h2>
+      <div id="skins"></div>
+    </div>
+
+    <div class="box princess">
+      <h2>Prinzessin</h2>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Princess_icon.png/600px-Princess_icon.png" alt="Prinzessin" />
+      <p id="princessTalk">Willkommen, edler Ritter!</p>
     </div>
   </div>
 
   <script>
-    // Spielvariablen
-    let coins = 100;
-    let bet = 10;
-    let playerPoints = 0;
-    let botPoints = 0;
-    let gameActive = false;
-    let lastGames = [];
+    let coins = 1000;
+    let credit = 0;
+    let playerScore = 0;
+    let botScore = 0;
+    let gameActive = true;
+    let currentBet = 10;
+    let creditPaybacks = [];
+    let history = [];
+    let skins = ["default", "blue", "red", "purple", "dots", "lines", "tiger", "neon"];
+    let currentSkin = "default";
+    let won = 0;
+    let lost = 0;
 
-    // Kreditvariablen
-    let creditAmount = 0;
-    let creditRounds = 0;
-    let creditStartRound = 0;
-    let currentRound = 0;
-
-    // Elemente
-    const drawBtn = document.getElementById('drawBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const startBtn = document.getElementById('startBtn');
-    const playerPointsDisplay = document.getElementById('playerPoints');
-    const messageBox = document.getElementById('messageBox');
-    const coinsDisplay = document.getElementById('coinsDisplay');
-    const betSlider = document.getElementById('betSlider');
-    const betAmountDisplay = document.getElementById('betAmount');
-    const creditAmountInput = document.getElementById('creditAmount');
-    const creditRoundsInput = document.getElementById('creditRounds');
-    const takeCreditBtn = document.getElementById('takeCreditBtn');
-    const creditInfo = document.getElementById('creditInfo');
-    const lastGamesList = document.getElementById('lastGamesList');
-
-    betSlider.addEventListener('input', () => {
-      bet = Number(betSlider.value);
-      betAmountDisplay.textContent = bet;
+    document.getElementById("bet").addEventListener("input", e => {
+      currentBet = parseInt(e.target.value);
+      document.getElementById("betDisplay").textContent = currentBet;
     });
 
-    takeCreditBtn.addEventListener('click', () => {
-      const amount = Number(creditAmountInput.value);
-      const rounds = Number(creditRoundsInput.value);
-      if(amount <= 0 || isNaN(amount)) {
-        alert('Bitte gib einen gültigen Kreditbetrag ein.');
-        return;
-      }
-      if(rounds < 1 || rounds > 10 || isNaN(rounds)) {
-        alert('Bitte gib eine Laufzeit zwischen 1 und 10 Runden ein.');
-        return;
-      }
-      creditAmount = amount;
-      creditRounds = rounds;
-      creditStartRound = currentRound;
-      coins += amount;
-      creditInfo.textContent = `Kredit über ${amount} Coins aufgenommen für ${rounds} Runden (Zinsen: ${rounds}%)`;
-      updateCoinsDisplay();
-    });
-
-    function updateCoinsDisplay() {
-      coinsDisplay.textContent = `Coins: ${coins.toFixed(2)}`;
+    function updateUI() {
+      document.getElementById("coins").textContent = coins;
+      document.getElementById("credit").textContent = credit;
+      document.getElementById("playerScore").textContent = playerScore;
+      document.getElementById("botScore").textContent = botScore;
+      document.getElementById("won").textContent = won;
+      document.getElementById("lost").textContent = lost;
     }
 
-    function botName() {
-      const names = ['Bot-Casino', 'DiceMaster', 'LuckyBot', 'WürfelKing', 'Glückspilz', 'Botzilla', 'MrDice', 'SpinBot', 'JackBot', 'DiceLord'];
-      return names[Math.floor(Math.random() * names.length)];
+    function draw() {
+      if (!gameActive) return;
+      if (playerScore >= 100 || currentBet > coins) return;
+      playerScore += Math.floor(Math.random() * 20 + 1);
+      coins -= currentBet;
+      updateUI();
+      if (playerScore >= 100) stopGame();
     }
 
-    function updateLastGames() {
-      if(lastGames.length === 0) {
-        lastGamesList.textContent = 'Noch keine Spiele...';
-        return;
-      }
-      lastGamesList.innerHTML = '';
-      lastGames.slice().reverse().forEach(game => {
-        const div = document.createElement('div');
-        div.style.marginBottom = '6px';
-        div.innerHTML = `<strong>${game.win ? 'Gewonnen' : 'Verloren'}</strong> | Spieler: ${game.playerPoints} | ${game.botName}: ${game.botPoints} | Gewinn: ${game.profit.toFixed(2)} Coins`;
-        lastGamesList.appendChild(div);
-      });
-    }
-
-    function startGame() {
-      if(coins < bet) {
-        alert('Du hast nicht genug Coins für den Einsatz.');
-        return;
-      }
-      gameActive = true;
-      playerPoints = 0;
-      botPoints = 0;
-      currentRound++;
-      playerPointsDisplay.textContent = playerPoints;
-      messageBox.textContent = 'Würfeln oder stoppen?';
-      drawBtn.disabled = false;
-      stopBtn.disabled = false;
-      startBtn.disabled = true;
-    }
-
-    // Anzahl der Würfe zählen
-    let drawCount = 0;
-
-    drawBtn.addEventListener('click', () => {
-      if(!gameActive) return;
-      let roll = Math.floor(Math.random() * 10) + 1;
-      playerPoints += roll;
-      drawCount++;
-      if(playerPoints > 100){
-        playerPointsDisplay.textContent = playerPoints + " (Überschritten!)";
-        endRound(false, "Du hast 100 überschritten! Verloren.");
-      } else if (playerPoints === 100){
-        playerPointsDisplay.textContent = playerPoints;
-        endRound(true, "Glückwunsch! Du hast genau 100 erreicht!");
-      } else {
-        playerPointsDisplay.textContent = playerPoints;
-        messageBox.textContent = `Du hast eine ${roll} gewürfelt. Weiter oder stoppen?`;
-      }
-    });
-
-    stopBtn.addEventListener('click', () => {
-      if(!gameActive) return;
-      endRound(null, "Du hast gestoppt.");
-    });
-
-    startBtn.addEventListener('click', () => {
-      startGame();
-      creditInfo.textContent = '';
-    });
-
-    function botPlay(rollsPlayer, playerPoints) {
-      botPoints = 0;
-      for(let i=0; i<rollsPlayer; i++) {
-        if(botPoints >= 85) break; // Bot hört bei 85 auf
-        let roll = Math.floor(Math.random() * 10) + 1;
-        botPoints += roll;
-        if(botPoints > 100) break; // Überschreitung Bot sofort verloren
-      }
-    }
-
-    function endRound(playerWon, msg) {
+    function stopGame() {
       gameActive = false;
-      drawBtn.disabled = true;
-      stopBtn.disabled = true;
-      startBtn.disabled = false;
-
-      botPlay(drawCount, playerPoints);
-
-      messageBox.textContent = msg;
-
-      let winner = null; 
-      if(playerWon === true) {
-        winner = 'player';
-      } else if(playerWon === false) {
-        winner = 'bot';
-      } else {
-        if(playerPoints > 100) winner = 'bot';
-        else if(botPoints > 100) winner = 'player';
-        else if(playerPoints > botPoints) winner = 'player';
-        else if(playerPoints < botPoints) winner = 'bot';
-        else winner = 'bot'; // Gleichstand Bot gewinnt
+      botScore = 0;
+      let name = ["Sir Coinalot", "Botricia", "Gambletron", "Luckius", "Princess Botra"];
+      let bot = name[Math.floor(Math.random() * name.length)];
+      document.getElementById("botName").textContent = `Bot (${bot}):`;
+      while (botScore < playerScore && botScore < 100) {
+        botScore += Math.floor(Math.random() * 20 + 1);
       }
-
-      let profit = 0;
-      if(winner === 'player') {
-        profit = bet * 1.5; // Einsatz + 50%
-        coins += profit;
-        messageBox.textContent += ` Du gewinnst ${profit.toFixed(2)} Coins!`;
+      let result = "Verloren";
+      if (playerScore <= 100 && (botScore > 100 || playerScore > botScore)) {
+        result = "Gewonnen";
+        let reward = currentBet + Math.floor(currentBet * 0.5);
+        coins += reward;
+        won++;
       } else {
-        coins -= bet;
-        profit = -bet;
-        messageBox.textContent += ` Du verlierst deinen Einsatz von ${bet} Coins.`;
+        lost++;
       }
-
-      if(coins < 0) coins = 0;
-
-      lastGames.push({
-        playerPoints: playerPoints,
-        botPoints: botPoints,
-        botName: botName(),
-        win: winner === 'player',
-        profit: profit
-      });
-
-      if(lastGames.length > 5) lastGames.shift();
-
-      updateCoinsDisplay();
-      updateLastGames();
-      checkCreditRepayment();
+      history.unshift(`${result} – Du: ${playerScore}, Bot: ${botScore}`);
+      if (history.length > 5) history.pop();
+      document.getElementById("history").innerHTML = history.map(h => `<li>${h}</li>`).join("");
+      playerScore = 0;
+      botScore = 0;
+      gameActive = true;
+      updateUI();
+      princessTalk(result === "Gewonnen" ? "Bravo! Du hast ihn geschlagen!" : "Oh nein, er war stärker!");
+      handleCreditPayback();
     }
 
-    function checkCreditRepayment() {
-      if(creditAmount <= 0) return;
-      const roundsPlayedSinceCredit = currentRound - creditStartRound;
-      if(roundsPlayedSinceCredit >= creditRounds) {
-        const totalDebt = creditAmount * (1 + creditRounds / 100);
-        if(coins >= totalDebt) {
-          coins -= totalDebt;
-          creditInfo.textContent = `Kredit über ${creditAmount} Coins + ${creditRounds}% Zinsen (insgesamt ${totalDebt.toFixed(2)} Coins) wurde zurückgezahlt.`;
-          creditAmount = 0;
-          creditRounds = 0;
-          creditStartRound = 0;
-          updateCoinsDisplay();
-        } else {
-          creditInfo.textContent = `Nicht genügend Coins (${coins.toFixed(2)}) zur Rückzahlung des Kredits (${totalDebt.toFixed(2)}). Bitte spiele weiter oder nimm einen neuen Kredit.`;
+    function takeCredit() {
+      const amount = parseInt(document.getElementById("creditAmount").value);
+      const rounds = parseInt(document.getElementById("creditRounds").value);
+      if (isNaN(amount) || isNaN(rounds)) return;
+      coins += amount;
+      credit += amount;
+      creditPaybacks.push({ due: rounds, total: Math.floor(amount * (1 + rounds / 100)) });
+      updateUI();
+    }
+
+    function handleCreditPayback() {
+      creditPaybacks.forEach(c => c.due--);
+      let repaid = 0;
+      creditPaybacks = creditPaybacks.filter(c => {
+        if (c.due <= 0) {
+          coins -= c.total;
+          credit -= c.total;
+          repaid += c.total;
+          return false;
         }
+        return true;
+      });
+      if (repaid > 0) princessTalk(`Du hast ${repaid} Coins zurückgezahlt.`);
+    }
+
+    function princessTalk(text) {
+      document.getElementById("princessTalk").textContent = text;
+    }
+
+    function claimBonus() {
+      const last = localStorage.getItem("lastBonus") || 0;
+      const now = Date.now();
+      if (now - last >= 86400000) {
+        coins += 100;
+        localStorage.setItem("lastBonus", now);
+        document.getElementById("lastBonus").textContent = new Date(now).toLocaleString();
+        princessTalk("Hier sind deine täglichen Coins!");
+        updateUI();
+      } else {
+        princessTalk("Morgen wieder!");
       }
     }
 
-    updateCoinsDisplay();
-    updateLastGames();
+    function loadBonusTimer() {
+      setInterval(() => {
+        const last = localStorage.getItem("lastBonus") || 0;
+        const next = Math.max(0, 86400000 - (Date.now() - last));
+        const h = Math.floor(next / 3600000);
+        const m = Math.floor((next % 3600000) / 60000);
+        const s = Math.floor((next % 60000) / 1000);
+        document.getElementById("bonusTimer").textContent = `${h}h ${m}m ${s}s`;
+      }, 1000);
+    }
+
+    function initSkins() {
+      const container = document.getElementById("skins");
+      skins.forEach(skin => {
+        const btn = document.createElement("div");
+        btn.className = "skin-toggle";
+        btn.textContent = skin;
+        btn.onclick = () => {
+          document.body.className = skin;
+          document.querySelectorAll(".skin-toggle").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          princessTalk(`Ich finde das ${skin}-Outfit sehr stilvoll!`);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    // Init
+    updateUI();
+    initSkins();
+    loadBonusTimer();
+    const lastBonus = localStorage.getItem("lastBonus") || 0;
+    if (lastBonus > 0) document.getElementById("lastBonus").textContent = new Date(parseInt(lastBonus)).toLocaleString();
   </script>
 </body>
 </html>
