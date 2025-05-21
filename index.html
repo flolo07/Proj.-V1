@@ -1,376 +1,517 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Casino Push-to-100</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-  body {
-    background: #004d00; /* tiefes grün */
-    color: #f0d46e; /* gold */
-    font-family: 'Montserrat', sans-serif;
-    margin: 0; padding: 20px;
-    display: flex; flex-direction: column; align-items: center;
-    min-height: 100vh;
-  }
-  h1 {
-    margin-bottom: 10px;
-    color: #f0d46e;
-    text-shadow: 1px 1px 2px black;
-  }
-  .game-container {
-    background: #111;
-    border-radius: 12px;
-    padding: 20px;
-    width: 350px;
-    box-shadow: 0 0 15px 3px rgba(240, 212, 110, 0.6);
-  }
-  label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 700;
-    color: #f0d46e;
-  }
-  input[type=range] {
-    width: 100%;
-    -webkit-appearance: none;
-    background: #222;
-    border-radius: 6px;
-    height: 12px;
-    outline: none;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 26px;
-    height: 26px;
-    background: #c1272d; /* casino rot */
-    cursor: pointer;
-    border-radius: 50%;
-    border: 2px solid #f0d46e;
-    margin-top: -7px;
-    transition: background 0.3s ease;
-  }
-  input[type=range]::-webkit-slider-thumb:hover {
-    background: #ff4d4d;
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 26px;
-    height: 26px;
-    background: #c1272d;
-    cursor: pointer;
-    border-radius: 50%;
-    border: 2px solid #f0d46e;
-    transition: background 0.3s ease;
-  }
-  input[type=range]::-moz-range-thumb:hover {
-    background: #ff4d4d;
-  }
-  .button {
-    margin-top: 15px;
-    width: 100%;
-    padding: 12px;
-    background: #c1272d;
-    color: #f0d46e;
-    font-weight: 700;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 0 10px #c1272daa;
-    transition: background 0.3s ease;
-  }
-  .button:hover:enabled {
-    background: #ff4d4d;
-    box-shadow: 0 0 15px #ff4d4daa;
-  }
-  .button:disabled {
-    background: #660000;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-  .info {
-    margin-top: 15px;
-    font-size: 1rem;
-    color: #f0d46e;
-    text-align: center;
-  }
-  .slider-display {
-    margin-top: 20px;
-  }
-  .slider-display input[type=range] {
-    pointer-events: none;
-    cursor: default;
-    background: #222;
-  }
-  .slider-label {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-top: 5px;
-    text-align: center;
-    color: #f0d46e;
-    text-shadow: 1px 1px 2px black;
-  }
-  .coins {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #f0d46e;
-    margin-bottom: 15px;
-    text-align: center;
-    text-shadow: 1px 1px 3px black;
-  }
-  .history {
-    margin-top: 20px;
-    background: #222;
-    border-radius: 10px;
-    padding: 10px;
-    max-height: 160px;
-    overflow-y: auto;
-    box-shadow: inset 0 0 10px #000000aa;
-  }
-  .history h2 {
-    margin-top: 0;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #f0d46e;
-    text-shadow: 1px 1px 2px black;
-    text-align: center;
-  }
-  .history-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.9rem;
-  }
-  .history-list li {
-    margin: 4px 0;
-    padding: 4px 6px;
-    border-radius: 5px;
-  }
-  .win {
-    background: #2b5f2b;
-    color: #b6f2b6;
-  }
-  .lose {
-    background: #5f2b2b;
-    color: #f2b6b6;
-  }
-  .tie {
-    background: #444444;
-    color: #cccccc;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Casino Dice Game mit Kredit</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #000;
+      background-image:
+        linear-gradient(45deg, #bfa14a 25%, transparent 25%),
+        linear-gradient(-45deg, #bfa14a 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #bfa14a 75%),
+        linear-gradient(-45deg, transparent 75%, #bfa14a 75%);
+      background-size: 40px 40px;
+      background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+      color: #f0d75a;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    .container {
+      background: #111;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #bfa14a;
+      display: flex;
+      padding: 20px;
+      max-width: 900px;
+      width: 100%;
+      gap: 20px;
+      color: #eee;
+    }
+
+    .left, .center, .right {
+      background: #121212;
+      border: 2px solid #bfa14a;
+      border-radius: 12px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .left, .right {
+      width: 180px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      font-size: 0.9rem;
+      color: #f0d75a;
+    }
+
+    .center {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      color: #f0d75a;
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      font-weight: 700;
+      text-align: center;
+      color: #f0d75a;
+      text-shadow: 0 0 6px #d4af37;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #bfa14a;
+      background: #222;
+      color: #f0d75a;
+      font-size: 1rem;
+      outline-offset: 2px;
+      outline-color: #d4af37;
+    }
+
+    button {
+      background: #bfa14a;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      color: #000;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.25s ease, transform 0.15s ease;
+      user-select: none;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #d4af37;
+      transform: scale(1.05);
+    }
+
+    button:disabled {
+      background-color: #444;
+      color: #888;
+      cursor: default;
+      transform: none;
+    }
+
+    #scoreboard {
+      background: #222;
+      border-radius: 10px;
+      padding: 10px;
+      height: 220px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      color: #f0d75a;
+      box-shadow: inset 0 0 10px #bfa14a;
+    }
+
+    #scoreboard h2 {
+      margin-top: 0;
+      text-align: center;
+      font-weight: 700;
+      text-shadow: 0 0 5px #d4af37;
+    }
+
+    #coinsDisplay, #creditInfo {
+      font-size: 1.1rem;
+      text-align: center;
+      font-weight: 700;
+      margin-top: 10px;
+      min-height: 1.2em;
+      text-shadow: 0 0 6px #d4af37;
+    }
+
+    .slider-container {
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 12px;
+      border-radius: 10px;
+      background: #333;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #bfa14a;
+      cursor: pointer;
+      box-shadow: 0 0 8px #d4af37;
+      transition: background-color 0.25s ease;
+      margin-top: -8px;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background-color: #d4af37;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #bfa14a;
+      cursor: pointer;
+      box-shadow: 0 0 8px #d4af37;
+      transition: background-color 0.25s ease;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+    }
+
+    .points-display {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #d4af37;
+      text-shadow: 0 0 8px #bfa14a;
+      user-select: none;
+      margin: 15px 0;
+    }
+
+    #messageBox {
+      min-height: 3em;
+      font-weight: 700;
+      color: #d4af37;
+      text-align: center;
+      margin-bottom: 5px;
+      text-shadow: 0 0 5px #bfa14a;
+      min-height: 40px;
+    }
+
+    .last-games {
+      font-size: 0.9rem;
+      background: #222;
+      border-radius: 10px;
+      padding: 10px;
+      height: 120px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 10px #bfa14a;
+      color: #f0d75a;
+      user-select: none;
+    }
+
+    .last-games h3 {
+      margin: 0 0 8px 0;
+      text-align: center;
+      font-weight: 700;
+      text-shadow: 0 0 5px #d4af37;
+    }
+
+    .last-games p {
+      margin: 2px 0;
+      line-height: 1.3;
+    }
+
+    /* Scrollbar gold style */
+    .last-games::-webkit-scrollbar {
+      width: 8px;
+    }
+    .last-games::-webkit-scrollbar-thumb {
+      background-color: #bfa14a;
+      border-radius: 10px;
+    }
+    .last-games::-webkit-scrollbar-track {
+      background: #222;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
 
-<h1>Casino Push-to-100</h1>
-
-<div class="game-container">
-  <div class="coins" id="coinsDisplay">Coins: 100</div>
-
-  <label for="betSlider">Einsatz wählen (Coins): <span id="betAmount">10</span></label>
-  <input type="range" id="betSlider" min="1" max="100" value="10" />
-
-  <button class="button" id="startBtn">Spiel Starten</button>
-
-  <div id="playerArea" style="display:none;">
-    <div class="slider-display">
-      <label>Dein Wert:</label>
-      <input type="range" id="playerValue" min="0" max="100" value="0" readonly />
-      <div class="slider-label" id="playerValueLabel">0</div>
+    <!-- Kredit links -->
+    <div class="left">
+      <h2>Kredit aufnehmen</h2>
+      <label for="creditAmount">Betrag (Coins)</label>
+      <input type="number" id="creditAmount" min="1" step="1" placeholder="z.B. 100" />
+      <label for="creditRounds">Laufzeit (Runden)</label>
+      <input type="number" id="creditRounds" min="1" max="10" step="1" value="5" />
+      <button id="takeCreditBtn">Kredit aufnehmen</button>
+      <div id="creditInfo"></div>
     </div>
 
-    <button class="button" id="drawBtn">Punkte ziehen</button>
-    <button class="button" id="stopBtn">Stopp</button>
+    <!-- Spiel Mitte -->
+    <div class="center">
+      <h1>🎲 Casino Dice Game</h1>
+      <div id="messageBox">Viel Glück!</div>
+
+      <div>
+        <label for="betSlider">Setze deinen Einsatz (Coins): <span id="betAmount">10</span></label>
+        <input type="range" id="betSlider" min="1" max="100" value="10" />
+      </div>
+
+      <div class="points-display" id="playerPoints">0</div>
+
+      <div class="btn-group">
+        <button id="drawBtn">Würfeln</button>
+        <button id="stopBtn" disabled>Stop</button>
+        <button id="startBtn" disabled>Neu starten</button>
+      </div>
+
+      <div class="last-games">
+        <h3>Letzte 5 Spiele</h3>
+        <div id="lastGamesList">Noch keine Spiele...</div>
+      </div>
+    </div>
+
+    <!-- Kontostand rechts -->
+    <div class="right">
+      <h2>Kontostand</h2>
+      <div id="coinsDisplay">Coins: 100</div>
+    </div>
   </div>
 
-  <div id="result" class="info"></div>
-</div>
+  <script>
+    // Initial Werte
+    let coins = 100;
+    let bet = 10;
+    let playerPoints = 0;
+    let botPoints = 0;
+    let gameActive = false;
 
-<div class="history">
-  <h2>Letzte 5 Spiele</h2>
-  <ul class="history-list" id="historyList"></ul>
-</div>
+    // Kredit Variablen
+    let creditAmount = 0;
+    let creditRounds = 0;
+    let creditStartRound = 0;
+    let currentRound = 0;
 
-<script>
-  // Bot-Namen-Liste
-  const botNames = [
-    "Lucky Leo",
-    "Red Ruby",
-    "Golden Grace",
-    "Silver Sam",
-    "Black Jack",
-    "Queen Vegas",
-    "Iron Ivan",
-    "Mystic Mike"
-  ];
+    // Bot Namen
+    const botNames = ['Lenny', 'Maya', 'Max', 'Zara', 'Finn', 'Luna', 'Nico', 'Mila', 'Oskar', 'Sophie'];
 
-  // Game state
-  let coins = 100;
-  let bet = 10;
-  let playerValue = 0;
-  let botValue = 0;
-  let gameActive = false;
-  let history = [];
-  let playerDrawCount = 0;
+    // Elemente
+    const betSlider = document.getElementById('betSlider');
+    const betAmountDisplay = document.getElementById('betAmount');
+    const drawBtn = document.getElementById('drawBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const startBtn = document.getElementById('startBtn');
+    const playerPointsDisplay = document.getElementById('playerPoints');
+    const messageBox = document.getElementById('messageBox');
+    const lastGamesList = document.getElementById('lastGamesList');
+    const coinsDisplay = document.getElementById('coinsDisplay');
+    const creditAmountInput = document.getElementById('creditAmount');
+    const creditRoundsInput = document.getElementById('creditRounds');
+    const takeCreditBtn = document.getElementById('takeCreditBtn');
+    const creditInfo = document.getElementById('creditInfo');
 
-  const coinsDisplay = document.getElementById('coinsDisplay');
-  const betSlider = document.getElementById('betSlider');
-  const betAmountSpan = document.getElementById('betAmount');
-  const startBtn = document.getElementById('startBtn');
-  const playerArea = document.getElementById('playerArea');
-  const playerValueSlider = document.getElementById('playerValue');
-  const playerValueLabel = document.getElementById('playerValueLabel');
-  const drawBtn = document.getElementById('drawBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const resultDiv = document.getElementById('result');
-  const historyList = document.getElementById('historyList');
+    let lastGames = [];
 
-  // Aktueller Bot-Name für das laufende Spiel
-  let currentBotName = "";
+    betSlider.addEventListener('input', () => {
+      bet = Number(betSlider.value);
+      betAmountDisplay.textContent = bet;
+      messageBox.textContent = `Einsatz auf ${bet} Coins gesetzt.`;
+    });
 
-  // Init
-  function updateCoinsDisplay() {
-    coinsDisplay.textContent = `Coins: ${coins}`;
-    betSlider.max = coins;
-    if (bet > coins) bet = coins;
-    betAmountSpan.textContent = bet;
-    betSlider.value = bet;
-  }
+    takeCreditBtn.addEventListener('click', () => {
+      const amt = parseInt(creditAmountInput.value);
+      const rounds = parseInt(creditRoundsInput.value);
 
-  betSlider.addEventListener('input', () => {
-    bet = parseInt(betSlider.value);
-    betAmountSpan.textContent = bet;
-  });
+      if (isNaN(amt) || amt <= 0) {
+        creditInfo.textContent = "Bitte einen gültigen Kreditbetrag eingeben.";
+        return;
+      }
+      if (isNaN(rounds) || rounds < 1 || rounds > 10) {
+        creditInfo.textContent = "Bitte Laufzeit zwischen 1 und 10 Runden wählen.";
+        return;
+      }
 
-  function getRandomPoints() {
-    return Math.floor(Math.random() * 20) + 1;
-  }
+      creditAmount += amt;
+      creditRounds = rounds;
+      creditStartRound = currentRound;
 
-  // Bot zieht genauso viele Karten wie Spieler
-  function botPlay(drawCount) {
-    botValue = 0;
-    for(let i = 0; i < drawCount; i++) {
-      botValue += getRandomPoints();
-      if(botValue > 100) break; // wenn überzogen, kann abbrechen
+      coins += amt;
+      updateCoinsDisplay();
+
+      creditInfo.textContent = `Kredit über ${amt} Coins aufgenommen. Rückzahlung nach ${rounds} Runden mit ${rounds}% Zinsen.`;
+      creditAmountInput.value = '';
+      creditRoundsInput.value = '5';
+    });
+
+    function updateCoinsDisplay() {
+      coinsDisplay.textContent = `Coins: ${coins.toFixed(2)}`;
     }
-  }
 
-  function endGame() {
-    gameActive = false;
-    drawBtn.disabled = true;
-    stopBtn.disabled = true;
-    startBtn.disabled = false;
-    playerArea.style.display = "none";
+    function updateLastGames() {
+      if(lastGames.length === 0){
+        lastGamesList.textContent = 'Noch keine Spiele...';
+        return;
+      }
+      lastGamesList.innerHTML = '';
+      lastGames.slice(-5).reverse().forEach(game => {
+        const p = document.createElement('p');
+        let outcome = game.win ? `<span style="color:#7dd87d">Gewonnen</span>` : `<span style="color:#d94b4b">Verloren</span>`;
+        p.innerHTML = `Du: <b>${game.playerPoints}</b>, Bot (${game.botName}): <b>${game.botPoints}</b> — ${outcome}, Gewinn: <b>${game.profit.toFixed(2)}</b> Coins`;
+        lastGamesList.appendChild(p);
+      });
+    }
 
-    botPlay(playerDrawCount);
+    function botName() {
+      return botNames[Math.floor(Math.random() * botNames.length)];
+    }
 
-    let resultText = `${currentBotName} hat ${botValue} erreicht. `;
+    // Bot zieht so lange wie du (ähnlich) aber stoppt bei >= 85
+    function botPlay(playerDraws, playerValue) {
+      botPoints = 0;
+      let draws = 0;
+      while (draws < playerDraws && botPoints < 85) {
+        botPoints += Math.floor(Math.random() * 10) + 1;
+        draws++;
+      }
+      // Bot kann nicht über 100 gehen
+      if(botPoints > 100) botPoints = 100;
+    }
 
-    // Ergebnis prüfen
-    let playerDiff = playerValue > 100 ? Infinity : 100 - playerValue;
-    let botDiff = botValue > 100 ? Infinity : 100 - botValue;
+    function startGame() {
+      if (bet > coins) {
+        messageBox.textContent = "Nicht genug Coins für den Einsatz!";
+        return;
+      }
+      playerPoints = 0;
+      botPoints = 0;
+      gameActive = true;
+      currentRound++;
+      drawCount = 0;
+      messageBox.textContent = "Würfle und versuche, so nah wie möglich an 100 zu kommen!";
+      drawBtn.disabled = false;
+      stopBtn.disabled = false;
+      startBtn.disabled = true;
+      playerPointsDisplay.textContent = "0";
+    }
 
-    if(playerDiff === botDiff) {
-      resultText += "Unentschieden! Dein Einsatz wird zurückgegeben.";
-      // Coins zurück
-    } else if(playerDiff < botDiff) {
-      // Spieler gewinnt
-      const winCoins = Math.floor(bet * 1.5);
-      coins += winCoins;
-      resultText += `Du gewinnst! Du erhältst ${winCoins} Coins (Einsatz + 50%).`;
-      addHistory("win");
-    } else {
-      // Bot gewinnt
-      coins -= bet;
-      resultText += `Du verlierst deinen Einsatz von ${bet} Coins.`;
-      addHistory("lose");
+    let drawCount = 0;
+
+    drawBtn.addEventListener('click', () => {
+      if(!gameActive) return;
+      let roll = Math.floor(Math.random() * 10) + 1;
+      playerPoints += roll;
+      drawCount++;
+      if(playerPoints > 100){
+        playerPointsDisplay.textContent = playerPoints + " (Überschritten!)";
+        endRound(false, "Du hast 100 überschritten! Verloren.");
+      } else if (playerPoints === 100){
+        playerPointsDisplay.textContent = playerPoints;
+        endRound(true, "Glückwunsch! Du hast genau 100 erreicht!");
+      } else {
+        playerPointsDisplay.textContent = playerPoints;
+        messageBox.textContent = `Du hast eine ${roll} gewürfelt. Weiter oder stoppen?`;
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if(!gameActive) return;
+      endRound(null, "Du hast gestoppt.");
+    });
+
+    startBtn.addEventListener('click', () => {
+      startGame();
+      creditInfo.textContent = '';
+    });
+
+    function endRound(playerWon, msg) {
+      gameActive = false;
+      drawBtn.disabled = true;
+      stopBtn.disabled = true;
+      startBtn.disabled = false;
+
+      botPlay(drawCount, playerPoints);
+
+      messageBox.textContent = msg;
+
+      // Entscheidung wer gewinnt
+      // Wenn playerWon === true => Spieler gewinnt
+      // Wenn false => Spieler verliert
+      // Wenn null => Spieler hat gestoppt, Entscheidung durch Punkte
+
+      let winner = null; 
+      if(playerWon === true) {
+        winner = 'player';
+      } else if(playerWon === false) {
+        winner = 'bot';
+      } else {
+        if(playerPoints > 100) winner = 'bot';
+        else if(botPoints > 100) winner = 'player';
+        else if(playerPoints > botPoints) winner = 'player';
+        else if(playerPoints < botPoints) winner = 'bot';
+        else winner = 'bot'; // Gleichstand Bot gewinnt
+      }
+
+      let profit = 0;
+      if(winner === 'player') {
+        profit = bet * 1.5; // Einsatz + 50%
+        coins += profit;
+        messageBox.textContent += ` Du gewinnst ${profit.toFixed(2)} Coins!`;
+      } else {
+        coins -= bet;
+        profit = -bet;
+        messageBox.textContent += ` Du verlierst deinen Einsatz von ${bet} Coins.`;
+      }
+
+      // Limit Coins auf >= 0
+      if(coins < 0) coins = 0;
+
+      // Letzte Spiele speichern
+      lastGames.push({
+        playerPoints: playerPoints,
+        botPoints: botPoints,
+        botName: botName(),
+        win: winner === 'player',
+        profit: profit
+      });
+
+      if(lastGames.length > 5) lastGames.shift();
+
+      updateCoinsDisplay();
+      updateLastGames();
+      checkCreditRepayment();
+    }
+
+    function checkCreditRepayment() {
+      if(creditAmount <= 0) return;
+      const roundsPlayedSinceCredit = currentRound - creditStartRound;
+      if(roundsPlayedSinceCredit >= creditRounds) {
+        const totalDebt = creditAmount * (1 + creditRounds / 100);
+        if(coins >= totalDebt) {
+          coins -= totalDebt;
+          creditInfo.textContent = `Kredit über ${creditAmount} Coins + ${creditRounds}% Zinsen (insgesamt ${totalDebt.toFixed(2)} Coins) wurde zurückgezahlt.`;
+          creditAmount = 0;
+          creditRounds = 0;
+          creditStartRound = 0;
+          updateCoinsDisplay();
+        } else {
+          creditInfo.textContent = `Nicht genügend Coins (${coins.toFixed(2)}) zur Rückzahlung des Kredits (${totalDebt.toFixed(2)}). Bitte spiele weiter oder nimm einen neuen Kredit.`;
+        }
+      }
     }
 
     updateCoinsDisplay();
-    resultDiv.textContent = resultText;
-  }
-
-  function addHistory(outcome) {
-    // outcome: "win", "lose", "tie"
-    if(history.length >= 5) history.shift();
-    history.push({
-      outcome,
-      playerPoints: playerValue,
-      botPoints: botValue,
-      bet
-    });
-    renderHistory();
-  }
-
-  function renderHistory() {
-    historyList.innerHTML = "";
-    history.forEach(game => {
-      const li = document.createElement('li');
-      let cls = "";
-      if(game.outcome === "win") cls = "win";
-      else if(game.outcome === "lose") cls = "lose";
-      else cls = "tie";
-
-      li.className = cls;
-      li.textContent = `${game.outcome === "win" ? "✔ Gewinn" : game.outcome === "lose" ? "✘ Verlust" : "– Unentschieden"} | Du: ${game.playerPoints} | ${currentBotName}: ${game.botPoints} | Einsatz: ${game.bet} Coins`;
-      historyList.appendChild(li);
-    });
-  }
-
-  function resetGame() {
-    playerValue = 0;
-    playerDrawCount = 0;
-    playerValueSlider.value = playerValue;
-    playerValueLabel.textContent = playerValue;
-    resultDiv.textContent = "";
-    drawBtn.disabled = false;
-    stopBtn.disabled = false;
-  }
-
-  startBtn.addEventListener('click', () => {
-    if(bet > coins) {
-      alert("Du hast nicht genug Coins!");
-      return;
-    }
-    if(coins <= 0) {
-      alert("Keine Coins mehr! Spiel vorbei.");
-      return;
-    }
-
-    currentBotName = botNames[Math.floor(Math.random() * botNames.length)];
-    resetGame();
-    gameActive = true;
-    playerArea.style.display = "block";
-    startBtn.disabled = true;
-    resultDiv.textContent = `Du spielst gegen ${currentBotName}. Ziehe Punkte, um so nah wie möglich an 100 zu kommen ohne drüber!`;
-  });
-
-  drawBtn.addEventListener('click', () => {
-    if(!gameActive) return;
-
-    const draw = getRandomPoints();
-    playerValue += draw;
-    playerDrawCount++;
-    if(playerValue > 100) {
-      playerValueSlider.value = playerValue > 100 ? 100 : playerValue;
-      playerValueLabel.textContent = playerValue;
-      endGame();
-    } else {
-      playerValueSlider.value = playerValue;
-      playerValueLabel.textContent = playerValue;
-    }
-  });
-
-  stopBtn.addEventListener('click', () => {
-    if(!gameActive) return;
-    endGame();
-  });
-
-  updateCoinsDisplay();
-  renderHistory();
-</script>
-
+    updateLastGames();
+  </script>
 </body>
 </html>
