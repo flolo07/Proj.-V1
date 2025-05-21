@@ -1,6 +1,364 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Casino Push-to-100</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+  body {
+    background: #004d00; /* tiefes grün */
+    color: #f0d46e; /* gold */
+    font-family: 'Montserrat', sans-serif;
+    margin: 0; padding: 20px;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
+  }
+  h1 {
+    margin-bottom: 10px;
+    color: #f0d46e;
+    text-shadow: 1px 1px 2px black;
+  }
+  .game-container {
+    background: #111;
+    border-radius: 12px;
+    padding: 20px;
+    width: 350px;
+    box-shadow: 0 0 15px 3px rgba(240, 212, 110, 0.6);
+  }
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    color: #f0d46e;
+  }
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    background: #222;
+    border-radius: 6px;
+    height: 12px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    background: #c1272d; /* casino rot */
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid #f0d46e;
+    margin-top: -7px;
+    transition: background 0.3s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    background: #ff4d4d;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    background: #c1272d;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid #f0d46e;
+    transition: background 0.3s ease;
+  }
+  input[type=range]::-moz-range-thumb:hover {
+    background: #ff4d4d;
+  }
+  .button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 12px;
+    background: #c1272d;
+    color: #f0d46e;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #c1272daa;
+    transition: background 0.3s ease;
+  }
+  .button:hover:enabled {
+    background: #ff4d4d;
+    box-shadow: 0 0 15px #ff4d4daa;
+  }
+  .button:disabled {
+    background: #660000;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .info {
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #f0d46e;
+    text-align: center;
+  }
+  .slider-display {
+    margin-top: 20px;
+  }
+  .slider-display input[type=range] {
+    pointer-events: none;
+    cursor: default;
+    background: #222;
+  }
+  .slider-label {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-top: 5px;
+    text-align: center;
+    color: #f0d46e;
+    text-shadow: 1px 1px 2px black;
+  }
+  .coins {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #f0d46e;
+    margin-bottom: 15px;
+    text-align: center;
+    text-shadow: 1px 1px 3px black;
+  }
+  .history {
+    margin-top: 20px;
+    background: #222;
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 130px;
+    overflow-y: auto;
+    box-shadow: inset 0 0 10px #000000aa;
+  }
+  .history h2 {
+    margin-top: 0;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #f0d46e;
+    text-shadow: 1px 1px 2px black;
+    text-align: center;
+  }
+  .history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .history-list li {
+    margin: 4px 0;
+    padding: 4px 6px;
+    border-radius: 5px;
+  }
+  .win {
+    background: #2b5f2b;
+    color: #b6f2b6;
+  }
+  .lose {
+    background: #5f2b2b;
+    color: #f2b6b6;
+  }
+  .tie {
+    background: #444444;
+    color: #cccccc;
+  }
+</style>
+</head>
+<body>
+
+<h1>Casino Push-to-100</h1>
+
+<div class="game-container">
+  <div class="coins" id="coinsDisplay">Coins: 100</div>
+
+  <label for="betSlider">Einsatz wählen (Coins): <span id="betAmount">10</span></label>
+  <input type="range" id="betSlider" min="1" max="100" value="10" />
+
+  <button class="button" id="startBtn">Spiel Starten</button>
+
+  <div id="playerArea" style="display:none;">
+    <div class="slider-display">
+      <label>Dein Wert:</label>
+      <input type="range" id="playerValue" min="0" max="100" value="0" readonly />
+      <div class="slider-label" id="playerValueLabel">0</div>
+    </div>
+
+    <button class="button" id="drawBtn">Punkte ziehen</button>
+    <button class="button" id="stopBtn">Stopp</button>
+  </div>
+
+  <div id="result" class="info"></div>
+</div>
+
+<div class="history">
+  <h2>Letzte 5 Spiele</h2>
+  <ul class="history-list" id="historyList"></ul>
+</div>
+
+<script>
+  // Game state
+  let coins = 100;
+  let bet = 10;
+  let playerValue = 0;
+  let botValue = 0;
+  let gameActive = false;
+  let history = [];
+
+  const coinsDisplay = document.getElementById('coinsDisplay');
+  const betSlider = document.getElementById('betSlider');
+  const betAmountSpan = document.getElementById('betAmount');
+  const startBtn = document.getElementById('startBtn');
+  const playerArea = document.getElementById('playerArea');
+  const playerValueSlider = document.getElementById('playerValue');
+  const playerValueLabel = document.getElementById('playerValueLabel');
+  const drawBtn = document.getElementById('drawBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const resultDiv = document.getElementById('result');
+  const historyList = document.getElementById('historyList');
+
+  // Init
+  function updateCoinsDisplay() {
+    coinsDisplay.textContent = `Coins: ${coins}`;
+    betSlider.max = coins;
+    if (bet > coins) bet = coins;
+    betAmountSpan.textContent = bet;
+    betSlider.value = bet;
+  }
+
+  betSlider.addEventListener('input', () => {
+    bet = parseInt(betSlider.value);
+    betAmountSpan.textContent = bet;
+  });
+
+  function getRandomPoints() {
+    return Math.floor(Math.random() * 20) + 1;
+  }
+
+  function botPlay() {
+    botValue = 0;
+    // Bot zieht solange bis >=85
+    while(botValue < 85) {
+      botValue += getRandomPoints();
+      if(botValue > 100) break;
+    }
+  }
+
+  function endGame() {
+    gameActive = false;
+    drawBtn.disabled = true;
+    stopBtn.disabled = true;
+    startBtn.disabled = false;
+    playerArea.style.display = "none";
+
+    botPlay();
+
+    let resultText = `Bot hat ${botValue} erreicht. `;
+
+    // Ergebnis prüfen
+    const playerBust = playerValue > 100;
+    const botBust = botValue > 100;
+
+    if (playerBust && botBust) {
+      resultText += "Beide über 100, Unentschieden! Dein Einsatz wird zurückerstattet.";
+      // Einsatz zurück, keine Änderung coins
+    } else if (playerBust) {
+      resultText += "Du hast überzogen, du verlierst deinen Einsatz.";
+      coins -= bet;
+      addHistory('Verloren', -bet);
+    } else if (botBust) {
+      resultText += "Bot hat überzogen, du gewinnst!";
+      let winAmount = Math.floor(bet * 1.5);
+      coins += winAmount;
+      addHistory('Gewonnen', winAmount);
+    } else {
+      // Beide <= 100, wer näher an 100?
+      const playerDiff = 100 - playerValue;
+      const botDiff = 100 - botValue;
+      if (playerDiff < botDiff) {
+        let winAmount = Math.floor(bet * 1.5);
+        coins += winAmount;
+        resultText += "Du hast gewonnen! Gewinn: +" + winAmount + " Coins.";
+        addHistory('Gewonnen', winAmount);
+      } else if (botDiff < playerDiff) {
+        coins -= bet;
+        resultText += "Du hast verloren! Einsatz: -" + bet + " Coins.";
+        addHistory('Verloren', -bet);
+      } else {
+        resultText += "Unentschieden! Einsatz wird zurückerstattet.";
+        addHistory('Unentschieden', 0);
+      }
+    }
+    updateCoinsDisplay();
+    updateHistoryUI();
+
+    if(coins <= 0) {
+      resultText += " Du hast keine Coins mehr. Spiel neu laden, um neu zu starten.";
+      startBtn.disabled = true;
+    }
+
+    resultDiv.textContent = resultText;
+  }
+
+  function addHistory(status, amount) {
+    history.unshift({status, amount});
+    if(history.length > 5) history.pop();
+  }
+
+  function updateHistoryUI() {
+    historyList.innerHTML = '';
+    history.forEach(entry => {
+      const li = document.createElement('li');
+      li.textContent = `${entry.status}: ${entry.amount > 0 ? "+" : ""}${entry.amount} Coins`;
+      if(entry.status === 'Gewonnen') li.classList.add('win');
+      else if(entry.status === 'Verloren') li.classList.add('lose');
+      else li.classList.add('tie');
+      historyList.appendChild(li);
+    });
+  }
+
+  startBtn.addEventListener('click', () => {
+    if(bet < 1 || bet > coins) {
+      alert("Bitte einen gültigen Einsatz wählen.");
+      return;
+    }
+    playerValue = 0;
+    playerValueSlider.value = 0;
+    playerValueLabel.textContent = "0";
+    gameActive = true;
+    drawBtn.disabled = false;
+    stopBtn.disabled = false;
+    startBtn.disabled = true;
+    playerArea.style.display = "block";
+    resultDiv.textContent = "";
+  });
+
+  drawBtn.addEventListener('click', () => {
+    if(!gameActive) return;
+    const points = getRandomPoints();
+    playerValue += points;
+    if(playerValue > 100) {
+      playerValueSlider.value = 100;
+      playerValueLabel.textContent = playerValue + " (über 100!)";
+      endGame();
+    } else {
+      playerValueSlider.value = playerValue;
+      playerValueLabel.textContent = playerValue;
+    }
+  });
+
+  stopBtn.addEventListener('click', () => {
+    if(!gameActive) return;
+    endGame();
+  });
+
+  // Init Anzeige
+  updateCoinsDisplay();
+  updateHistoryUI();
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="de">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chatroom v1</title>
