@@ -125,7 +125,7 @@
     background: #222;
     border-radius: 10px;
     padding: 10px;
-    max-height: 130px;
+    max-height: 160px;
     overflow-y: auto;
     box-shadow: inset 0 0 10px #000000aa;
   }
@@ -194,6 +194,18 @@
 </div>
 
 <script>
+  // Bot-Namen-Liste
+  const botNames = [
+    "Lucky Leo",
+    "Red Ruby",
+    "Golden Grace",
+    "Silver Sam",
+    "Black Jack",
+    "Queen Vegas",
+    "Iron Ivan",
+    "Mystic Mike"
+  ];
+
   // Game state
   let coins = 100;
   let bet = 10;
@@ -201,6 +213,7 @@
   let botValue = 0;
   let gameActive = false;
   let history = [];
+  let playerDrawCount = 0;
 
   const coinsDisplay = document.getElementById('coinsDisplay');
   const betSlider = document.getElementById('betSlider');
@@ -213,6 +226,9 @@
   const stopBtn = document.getElementById('stopBtn');
   const resultDiv = document.getElementById('result');
   const historyList = document.getElementById('historyList');
+
+  // Aktueller Bot-Name für das laufende Spiel
+  let currentBotName = "";
 
   // Init
   function updateCoinsDisplay() {
@@ -232,12 +248,12 @@
     return Math.floor(Math.random() * 20) + 1;
   }
 
-  function botPlay() {
+  // Bot zieht genauso viele Karten wie Spieler
+  function botPlay(drawCount) {
     botValue = 0;
-    // Bot zieht solange bis >=85
-    while(botValue < 85) {
+    for(let i = 0; i < drawCount; i++) {
       botValue += getRandomPoints();
-      if(botValue > 100) break;
+      if(botValue > 100) break; // wenn überzogen, kann abbrechen
     }
   }
 
@@ -248,340 +264,8 @@
     startBtn.disabled = false;
     playerArea.style.display = "none";
 
-    botPlay();
+    botPlay(playerDrawCount);
 
-    let resultText = `Bot hat ${botValue} erreicht. `;
+    let resultText = `${currentBotName} hat ${botValue} erreicht. `;
 
     // Ergebnis prüfen
-    const playerBust = playerValue > 100;
-    const botBust = botValue > 100;
-
-    if (playerBust && botBust) {
-      resultText += "Beide über 100, Unentschieden! Dein Einsatz wird zurückerstattet.";
-      // Einsatz zurück, keine Änderung coins
-    } else if (playerBust) {
-      resultText += "Du hast überzogen, du verlierst deinen Einsatz.";
-      coins -= bet;
-      addHistory('Verloren', -bet);
-    } else if (botBust) {
-      resultText += "Bot hat überzogen, du gewinnst!";
-      let winAmount = Math.floor(bet * 1.5);
-      coins += winAmount;
-      addHistory('Gewonnen', winAmount);
-    } else {
-      // Beide <= 100, wer näher an 100?
-      const playerDiff = 100 - playerValue;
-      const botDiff = 100 - botValue;
-      if (playerDiff < botDiff) {
-        let winAmount = Math.floor(bet * 1.5);
-        coins += winAmount;
-        resultText += "Du hast gewonnen! Gewinn: +" + winAmount + " Coins.";
-        addHistory('Gewonnen', winAmount);
-      } else if (botDiff < playerDiff) {
-        coins -= bet;
-        resultText += "Du hast verloren! Einsatz: -" + bet + " Coins.";
-        addHistory('Verloren', -bet);
-      } else {
-        resultText += "Unentschieden! Einsatz wird zurückerstattet.";
-        addHistory('Unentschieden', 0);
-      }
-    }
-    updateCoinsDisplay();
-    updateHistoryUI();
-
-    if(coins <= 0) {
-      resultText += " Du hast keine Coins mehr. Spiel neu laden, um neu zu starten.";
-      startBtn.disabled = true;
-    }
-
-    resultDiv.textContent = resultText;
-  }
-
-  function addHistory(status, amount) {
-    history.unshift({status, amount});
-    if(history.length > 5) history.pop();
-  }
-
-  function updateHistoryUI() {
-    historyList.innerHTML = '';
-    history.forEach(entry => {
-      const li = document.createElement('li');
-      li.textContent = `${entry.status}: ${entry.amount > 0 ? "+" : ""}${entry.amount} Coins`;
-      if(entry.status === 'Gewonnen') li.classList.add('win');
-      else if(entry.status === 'Verloren') li.classList.add('lose');
-      else li.classList.add('tie');
-      historyList.appendChild(li);
-    });
-  }
-
-  startBtn.addEventListener('click', () => {
-    if(bet < 1 || bet > coins) {
-      alert("Bitte einen gültigen Einsatz wählen.");
-      return;
-    }
-    playerValue = 0;
-    playerValueSlider.value = 0;
-    playerValueLabel.textContent = "0";
-    gameActive = true;
-    drawBtn.disabled = false;
-    stopBtn.disabled = false;
-    startBtn.disabled = true;
-    playerArea.style.display = "block";
-    resultDiv.textContent = "";
-  });
-
-  drawBtn.addEventListener('click', () => {
-    if(!gameActive) return;
-    const points = getRandomPoints();
-    playerValue += points;
-    if(playerValue > 100) {
-      playerValueSlider.value = 100;
-      playerValueLabel.textContent = playerValue + " (über 100!)";
-      endGame();
-    } else {
-      playerValueSlider.value = playerValue;
-      playerValueLabel.textContent = playerValue;
-    }
-  });
-
-  stopBtn.addEventListener('click', () => {
-    if(!gameActive) return;
-    endGame();
-  });
-
-  // Init Anzeige
-  updateCoinsDisplay();
-  updateHistoryUI();
-</script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chatroom v1</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(120deg, #1f1f1f, #3a3a3a);
-      color: #f1f1f1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px;
-    }
-
-    #login, #chat {
-      max-width: 600px;
-      width: 100%;
-      margin-top: 20px;
-    }
-
-    input, button {
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #555;
-      background-color: #2c2c2c;
-      color: #f1f1f1;
-    }
-
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    button:hover {
-      transform: scale(1.05);
-    }
-
-    #messages {
-      height: 300px;
-      overflow-y: scroll;
-      background: #1f1f1f;
-      border: 2px solid #888;
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 20px;
-    }
-
-    #messages p {
-      margin: 6px 0;
-      position: relative;
-    }
-
-    #messages p span.name {
-      font-weight: 600;
-      color: #7dd87d;
-    }
-
-    #inputForm {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    #chat {
-      display: none;
-    }
-
-    .online-users {
-      margin-top: 10px;
-      font-size: 0.9rem;
-      color: #bbb;
-    }
-
-    .delete-btn {
-      position: absolute;
-      right: 5px;
-      top: 0;
-      background: transparent;
-      border: none;
-      color: red;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-  </style>
-</head>
-<body>
-
-  <h1>💬 Chatroom v1</h1>
-
-  <div id="login">
-    <input type="text" id="username" placeholder="Dein Name" />
-    <button id="startChat">Betreten</button>
-  </div>
-
-  <div id="chat">
-    <div class="online-users" id="onlineUsers"></div>
-    <div id="messages" aria-live="polite"></div>
-    <form id="inputForm">
-      <input type="text" id="messageInput" placeholder="Nachricht schreiben..." required />
-      <button type="submit">Senden</button>
-    </form>
-  </div>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBk90QZ5OU5Y6oI0t7vJaapBFbbj75hINI",
-      authDomain: "chatroom-v1-593d5.firebaseapp.com",
-      databaseURL: "https://chatroom-v1-593d5-default-rtdb.firebaseio.com",
-      projectId: "chatroom-v1-593d5",
-      storageBucket: "chatroom-v1-593d5.appspot.com",
-      messagingSenderId: "896893640100",
-      appId: "1:896893640100:web:541435187c8ab13ce2b531",
-      measurementId: "G-2SDN322ZSE"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const loginDiv = document.getElementById("login");
-    const chatDiv = document.getElementById("chat");
-    const usernameInput = document.getElementById("username");
-    const startChat = document.getElementById("startChat");
-    const messageInput = document.getElementById("messageInput");
-    const inputForm = document.getElementById("inputForm");
-    const messagesDiv = document.getElementById("messages");
-    const onlineUsersDiv = document.getElementById("onlineUsers");
-
-    let username = "";
-    const usersRef = db.ref("onlineUsers");
-
-    window.addEventListener("load", () => {
-      const storedName = localStorage.getItem("chat_username");
-      if (storedName) {
-        username = storedName;
-        loginDiv.style.display = "none";
-        chatDiv.style.display = "block";
-        addUserOnline();
-        listenForMessages();
-        listenForOnlineUsers();
-      }
-    });
-
-    startChat.addEventListener("click", () => {
-      username = usernameInput.value.trim();
-      if (!username) return alert("Bitte gib deinen Namen ein.");
-      localStorage.setItem("chat_username", username);
-      loginDiv.style.display = "none";
-      chatDiv.style.display = "block";
-      addUserOnline();
-      listenForMessages();
-      listenForOnlineUsers();
-    });
-
-    inputForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const text = messageInput.value.trim();
-      if (text) {
-        db.ref("messages").push({
-          name: username,
-          text: text,
-          timestamp: Date.now()
-        });
-        messageInput.value = "";
-      }
-    });
-
-    function listenForMessages() {
-      const messagesRef = db.ref("messages");
-      messagesRef.off();
-
-      messagesRef.limitToLast(100).on("value", (snapshot) => {
-        messagesDiv.innerHTML = "";
-        const messages = snapshot.val();
-        for (let key in messages) {
-          const data = messages[key];
-          const p = document.createElement("p");
-          p.innerHTML = `<span class="name">${escapeHtml(data.name)}:</span> ${formatMessage(data.text)}`;
-
-          if (data.name === username) {
-            const delBtn = document.createElement("button");
-            delBtn.textContent = "🗑️";
-            delBtn.className = "delete-btn";
-            delBtn.onclick = () => db.ref("messages").child(key).remove();
-            p.appendChild(delBtn);
-          }
-
-          messagesDiv.appendChild(p);
-        }
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      });
-    }
-
-    function formatMessage(text) {
-      return escapeHtml(text).replace(/:\)/g, "😊").replace(/:D/g, "😄").replace(/<3/g, "❤️");
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function addUserOnline() {
-      const userRef = usersRef.child(username);
-      userRef.set(true);
-      userRef.onDisconnect().remove();
-    }
-
-    function listenForOnlineUsers() {
-      usersRef.on("value", (snapshot) => {
-        const users = Object.keys(snapshot.val() || {});
-        onlineUsersDiv.textContent = `Online: ${users.join(", ")}`;
-      });
-    }
-  </script>
-</body>
-</html>
