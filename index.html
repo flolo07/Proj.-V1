@@ -269,3 +269,108 @@
     let resultText = `${currentBotName} hat ${botValue} erreicht. `;
 
     // Ergebnis prüfen
+    let playerDiff = playerValue > 100 ? Infinity : 100 - playerValue;
+    let botDiff = botValue > 100 ? Infinity : 100 - botValue;
+
+    if(playerDiff === botDiff) {
+      resultText += "Unentschieden! Dein Einsatz wird zurückgegeben.";
+      // Coins zurück
+    } else if(playerDiff < botDiff) {
+      // Spieler gewinnt
+      const winCoins = Math.floor(bet * 1.5);
+      coins += winCoins;
+      resultText += `Du gewinnst! Du erhältst ${winCoins} Coins (Einsatz + 50%).`;
+      addHistory("win");
+    } else {
+      // Bot gewinnt
+      coins -= bet;
+      resultText += `Du verlierst deinen Einsatz von ${bet} Coins.`;
+      addHistory("lose");
+    }
+
+    updateCoinsDisplay();
+    resultDiv.textContent = resultText;
+  }
+
+  function addHistory(outcome) {
+    // outcome: "win", "lose", "tie"
+    if(history.length >= 5) history.shift();
+    history.push({
+      outcome,
+      playerPoints: playerValue,
+      botPoints: botValue,
+      bet
+    });
+    renderHistory();
+  }
+
+  function renderHistory() {
+    historyList.innerHTML = "";
+    history.forEach(game => {
+      const li = document.createElement('li');
+      let cls = "";
+      if(game.outcome === "win") cls = "win";
+      else if(game.outcome === "lose") cls = "lose";
+      else cls = "tie";
+
+      li.className = cls;
+      li.textContent = `${game.outcome === "win" ? "✔ Gewinn" : game.outcome === "lose" ? "✘ Verlust" : "– Unentschieden"} | Du: ${game.playerPoints} | ${currentBotName}: ${game.botPoints} | Einsatz: ${game.bet} Coins`;
+      historyList.appendChild(li);
+    });
+  }
+
+  function resetGame() {
+    playerValue = 0;
+    playerDrawCount = 0;
+    playerValueSlider.value = playerValue;
+    playerValueLabel.textContent = playerValue;
+    resultDiv.textContent = "";
+    drawBtn.disabled = false;
+    stopBtn.disabled = false;
+  }
+
+  startBtn.addEventListener('click', () => {
+    if(bet > coins) {
+      alert("Du hast nicht genug Coins!");
+      return;
+    }
+    if(coins <= 0) {
+      alert("Keine Coins mehr! Spiel vorbei.");
+      return;
+    }
+
+    currentBotName = botNames[Math.floor(Math.random() * botNames.length)];
+    resetGame();
+    gameActive = true;
+    playerArea.style.display = "block";
+    startBtn.disabled = true;
+    resultDiv.textContent = `Du spielst gegen ${currentBotName}. Ziehe Punkte, um so nah wie möglich an 100 zu kommen ohne drüber!`;
+  });
+
+  drawBtn.addEventListener('click', () => {
+    if(!gameActive) return;
+
+    const draw = getRandomPoints();
+    playerValue += draw;
+    playerDrawCount++;
+    if(playerValue > 100) {
+      playerValueSlider.value = playerValue > 100 ? 100 : playerValue;
+      playerValueLabel.textContent = playerValue;
+      endGame();
+    } else {
+      playerValueSlider.value = playerValue;
+      playerValueLabel.textContent = playerValue;
+    }
+  });
+
+  stopBtn.addEventListener('click', () => {
+    if(!gameActive) return;
+    endGame();
+  });
+
+  updateCoinsDisplay();
+  renderHistory();
+</script>
+
+</body>
+</html>
