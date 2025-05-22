@@ -14,9 +14,15 @@
     margin: 0;
     padding: 20px;
     display: flex;
+    justify-content: center;
+    gap: 40px;
+    user-select: none;
+  }
+
+  main {
+    display: flex;
     flex-direction: column;
     align-items: center;
-    user-select: none;
   }
 
   h1 {
@@ -140,6 +146,8 @@
     color: #ffd966;
     text-shadow: 0 0 6px #ffd966aa;
     margin-bottom: 5px;
+    min-width: 350px;
+    text-align: center;
   }
 
   #balance {
@@ -148,29 +156,71 @@
     color: #fff;
     margin-bottom: 10px;
     user-select: none;
+    text-align: center;
+  }
+
+  /* Statistik Box rechts */
+  #stats {
+    background: #162331dd;
+    border-radius: 12px;
+    padding: 20px 30px;
+    width: 280px;
+    color: #ffd966;
+    box-shadow: 0 0 15px #ff6f6188;
+    font-weight: 600;
+    user-select: none;
+  }
+  #stats h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 800;
+    font-size: 1.6rem;
+    text-shadow: 0 0 8px #ffd966cc;
+  }
+  #stats ul {
+    list-style: none;
+    padding: 0;
+    font-size: 1.15rem;
+  }
+  #stats ul li {
+    margin: 12px 0;
+    display: flex;
+    justify-content: space-between;
   }
 
 </style>
 </head>
 <body>
 
-<h1>PinQuest – Das Glücksspiel mit Multiplikator</h1>
+<main>
+  <h1>PinQuest – Das Glücksspiel mit Multiplikator</h1>
 
-<div id="coinControl">
-  <label for="coinRange">Einsatz:</label>
-  <input type="range" id="coinRange" min="1" max="1000" step="1" value="100" />
-  <div id="coinValue">100</div>
-</div>
+  <div id="coinControl">
+    <label for="coinRange">Einsatz:</label>
+    <input type="range" id="coinRange" min="1" max="1000" step="1" value="100" />
+    <div id="coinValue">100</div>
+  </div>
 
-<div id="board"></div>
+  <div id="board"></div>
 
-<div>
-  <button id="confirmBtn" disabled>Pin bestätigen</button>
-  <button id="nextRoundBtn" disabled>Nächste Runde</button>
-</div>
+  <div>
+    <button id="confirmBtn" disabled>Pin bestätigen</button>
+    <button id="nextRoundBtn" disabled>Nächste Runde</button>
+  </div>
 
-<div id="result"></div>
-<div id="balance">Kontostand: 1000 Coins</div>
+  <div id="result"></div>
+  <div id="balance">Kontostand: 1000 Coins</div>
+</main>
+
+<section id="stats">
+  <h2>Statistik</h2>
+  <ul>
+    <li>Runden gespielt: <span id="roundsPlayed">0</span></li>
+    <li>Gewonnen: <span id="roundsWon">0</span></li>
+    <li>Verloren: <span id="roundsLost">0</span></li>
+    <li>Gesamtbilanz: <span id="totalProfit">0</span> Coins</li>
+  </ul>
+</section>
 
 <script>
   const board = document.getElementById('board');
@@ -181,6 +231,11 @@
   const coinRange = document.getElementById('coinRange');
   const coinValueDisplay = document.getElementById('coinValue');
 
+  const roundsPlayedSpan = document.getElementById('roundsPlayed');
+  const roundsWonSpan = document.getElementById('roundsWon');
+  const roundsLostSpan = document.getElementById('roundsLost');
+  const totalProfitSpan = document.getElementById('totalProfit');
+
   const gridSize = 15;
   let selectedCell = null;
   let pinPlaced = false;
@@ -188,6 +243,12 @@
   let currentBet = parseInt(coinRange.value);
   let multiplier = 1;
   let multiplierMap = new Map();
+
+  // Statistik-Daten
+  let roundsPlayed = 0;
+  let roundsWon = 0;
+  let roundsLost = 0;
+  let totalProfit = 0;
 
   // Board aufbauen
   for(let i = 0; i < gridSize * gridSize; i++) {
@@ -232,7 +293,8 @@
     balance -= currentBet;
     updateBalance();
 
-    multiplier = (Math.random() * 4 + 1).toFixed(2);
+    // Multiplier 0.2 bis 5.0 für Gewinn oder Verlust
+    multiplier = (Math.random() * 4.8 + 0.2).toFixed(2);
     multiplierMap.clear();
 
     const pinRow = parseInt(selectedCell.dataset.row);
@@ -246,6 +308,7 @@
         const idx = r * gridSize + c;
         const cell = board.children[idx];
 
+        // Nachbar multiplikatoren sind nur zur Info (immer positiv)
         const m = (Math.random() * 4 + 1).toFixed(2);
         multiplierMap.set(idx, m);
 
@@ -255,9 +318,24 @@
     }
 
     const winAmount = (currentBet * multiplier).toFixed(2);
-    resultDiv.textContent = `Multiplikator: x${multiplier} → Gewinn: ${winAmount} Coins`;
+    const netProfit = winAmount - currentBet;
+
+    if(netProfit >= 0) {
+      roundsWon++;
+      resultDiv.style.color = '#6eff6e';
+      resultDiv.textContent = `Gewonnen! Multiplikator: x${multiplier} → Gewinn: ${winAmount} Coins (+${netProfit.toFixed(2)})`;
+    } else {
+      roundsLost++;
+      resultDiv.style.color = '#ff6f61';
+      resultDiv.textContent = `Verloren! Multiplikator: x${multiplier} → Auszahlung: ${winAmount} Coins (${netProfit.toFixed(2)})`;
+    }
+
+    roundsPlayed++;
+    totalProfit += netProfit;
+
     balance += parseFloat(winAmount);
     updateBalance();
+    updateStats();
 
     nextRoundBtn.disabled = false;
   });
@@ -282,6 +360,7 @@
     pinPlaced = false;
     multiplier = 1;
     resultDiv.textContent = '';
+    resultDiv.style.color = '#ffd966';
     confirmBtn.disabled = true;
     nextRoundBtn.disabled = true;
     coinRange.disabled = false;
@@ -308,12 +387,20 @@
     balanceDiv.textContent = `Kontostand: ${balance.toFixed(2)} Coins`;
   }
 
+  function updateStats() {
+    roundsPlayedSpan.textContent = roundsPlayed;
+    roundsWonSpan.textContent = roundsWon;
+    roundsLostSpan.textContent = roundsLost;
+    totalProfitSpan.textContent = totalProfit.toFixed(2);
+  }
+
   coinRange.addEventListener('input', () => {
     currentBet = parseInt(coinRange.value);
     coinValueDisplay.textContent = currentBet;
   });
 
   updateBalance();
+  updateStats();
 
 </script>
 
