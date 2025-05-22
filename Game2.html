@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Golf-Dart Glücksspiel</title>
+<title>Golf-Dart Glücksspiel 64x64</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,34 +12,42 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 15px;
     user-select: none;
   }
 
   h1 {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   #board {
     display: grid;
-    grid-template-columns: repeat(8, 50px);
-    grid-template-rows: repeat(8, 50px);
-    gap: 3px;
+    grid-template-columns: repeat(64, 15px);
+    grid-template-rows: repeat(64, 15px);
+    gap: 1px;
     background: #22223b;
-    padding: 10px;
+    padding: 5px;
     border-radius: 8px;
+    max-height: 960px;
+    max-width: 960px;
+    overflow: auto;
+    margin-bottom: 15px;
+    border: 1px solid #444;
   }
 
   .cell {
-    width: 50px;
-    height: 50px;
+    width: 15px;
+    height: 15px;
     background-color: #2a2a40;
-    border-radius: 6px;
+    border-radius: 3px;
     cursor: pointer;
     transition: background-color 0.3s;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 10px;
+    color: #eee;
+    user-select: none;
   }
 
   /* Schachbrett Muster */
@@ -54,16 +62,33 @@
   }
 
   .pin {
-    width: 20px;
-    height: 20px;
+    width: 12px;
+    height: 12px;
     background-color: #ff5757;
     border-radius: 50%;
-    box-shadow: 0 0 8px #ff5757;
+    box-shadow: 0 0 6px #ff5757;
+  }
+
+  .neighbor-multiplier {
+    position: relative;
+    color: #ffd166;
+    font-weight: bold;
+  }
+
+  .neighbor-multiplier::after {
+    content: attr(data-multiplier);
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: #ffd166;
+    pointer-events: none;
   }
 
   button {
-    margin-top: 20px;
-    padding: 10px 20px;
+    margin: 5px 10px 15px 10px;
+    padding: 10px 25px;
     font-size: 1.1rem;
     border: none;
     border-radius: 8px;
@@ -81,61 +106,87 @@
   }
 
   #result {
-    margin-top: 25px;
-    font-size: 1.5rem;
+    margin-top: 10px;
+    font-size: 1.4rem;
     font-weight: bold;
     min-height: 40px;
     color: #ffd166;
+    user-select: none;
+  }
+
+  #coinControl {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #coinValue {
+    font-weight: bold;
+    min-width: 50px;
+    text-align: right;
   }
 </style>
 </head>
 <body>
 
-<h1>Golf-Dart Glücksspiel</h1>
+<h1>Golf-Dart Glücksspiel 64x64</h1>
+
+<div id="coinControl">
+  <label for="coinRange">Einsatz: </label>
+  <input type="range" id="coinRange" min="1" max="1000" step="1" value="100" />
+  <div id="coinValue">100</div>
+</div>
 
 <div id="board"></div>
 
-<button id="confirmBtn" disabled>Pin bestätigen</button>
+<div>
+  <button id="confirmBtn" disabled>Pin bestätigen</button>
+  <button id="nextRoundBtn" disabled>Nächste Runde</button>
+</div>
 
 <div id="result"></div>
+<div id="balance">Kontostand: 1000 Coins</div>
 
 <script>
   const board = document.getElementById('board');
   const confirmBtn = document.getElementById('confirmBtn');
+  const nextRoundBtn = document.getElementById('nextRoundBtn');
   const resultDiv = document.getElementById('result');
+  const balanceDiv = document.getElementById('balance');
+  const coinRange = document.getElementById('coinRange');
+  const coinValueDisplay = document.getElementById('coinValue');
 
-  const gridSize = 8;
+  const gridSize = 64;
   let selectedCell = null;
   let pinPlaced = false;
+  let balance = 1000;
+  let currentBet = parseInt(coinRange.value);
+  let multiplier = 1;
+  let multiplierMap = new Map();
 
-  // Board erstellen mit Schachbrett-Muster (zeilenweise class)
-  for(let row = 0; row < gridSize; row++) {
-    const rowDiv = document.createElement('div');
-    rowDiv.classList.add('row');
-    if(row % 2 === 0) {
-      rowDiv.classList.add('row-even');
-    }
-    for(let col = 0; col < gridSize; col++) {
-      const cell = document.createElement('div');
-      cell.classList.add('cell');
-      cell.dataset.row = row;
-      cell.dataset.col = col;
-      cell.addEventListener('click', () => onCellClick(cell));
-      rowDiv.appendChild(cell);
-      board.appendChild(cell);
-    }
+  // Board aufbauen (einfach 1D Grid, Zeilen/Spalten nur zur Logik)
+  for(let i = 0; i < gridSize * gridSize; i++) {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    cell.dataset.index = i;
+    cell.dataset.row = Math.floor(i / gridSize);
+    cell.dataset.col = i % gridSize;
+    cell.addEventListener('click', () => onCellClick(cell));
+    board.appendChild(cell);
   }
 
   function onCellClick(cell) {
-    if(pinPlaced) return; // Nur eine Runde
+    if(pinPlaced) return; // nur eine Runde
 
     if(selectedCell) {
-      // Entferne alten Pin
-      selectedCell.innerHTML = '';
+      selectedCell.innerHTML = ''; // alten Pin löschen
+      clearNeighborMultipliers(selectedCell);
     }
 
     selectedCell = cell;
-    // Pin als Vorschau anzeigen
+
+    // Pin als Vorschau
     const pin = document.createElement('div');
     pin.classList.add('pin');
     cell.appendChild(pin);
@@ -146,16 +197,109 @@
 
   confirmBtn.addEventListener('click', () => {
     if(!selectedCell) return;
+    if(currentBet > balance) {
+      alert('Du hast nicht genug Coins für diesen Einsatz!');
+      return;
+    }
 
     pinPlaced = true;
     confirmBtn.disabled = true;
+    coinRange.disabled = true;
 
-    // Zufälligen Multiplikator generieren (1.00 bis 5.00, 2 Dezimalstellen)
-    const multiplier = (Math.random() * 4 + 1).toFixed(2);
+    // Einsätze abziehen
+    balance -= currentBet;
+    updateBalance();
 
-    resultDiv.textContent = `Dein Multiplikator ist: x${multiplier}`;
+    // Multiplikator für Pin zufällig
+    multiplier = (Math.random() * 4 + 1).toFixed(2);
+    multiplierMap.clear();
+
+    // Multiplikatoren für Nachbarfelder setzen (1 Block Abstand = 8 Felder)
+    const pinRow = parseInt(selectedCell.dataset.row);
+    const pinCol = parseInt(selectedCell.dataset.col);
+
+    for(let r = pinRow - 1; r <= pinRow + 1; r++) {
+      for(let c = pinCol - 1; c <= pinCol + 1; c++) {
+        if(r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
+        if(r === pinRow && c === pinCol) continue; // Pin selbst überspringen
+
+        const idx = r * gridSize + c;
+        const cell = board.children[idx];
+        // Zufälligen Multiplikator generieren (1.00 bis 5.00)
+        const m = (Math.random() * 4 + 1).toFixed(2);
+        multiplierMap.set(idx, m);
+
+        // Multiplikator anzeigen
+        cell.textContent = m;
+        cell.classList.add('neighbor-multiplier');
+      }
+    }
+
+    // Multiplikator anzeigen Ergebnis
+    const winAmount = (currentBet * multiplier).toFixed(2);
+    resultDiv.textContent = `Dein Multiplikator: x${multiplier} → Gewinn: ${winAmount} Coins`;
+
+    // Gewinn gutschreiben
+    balance += parseFloat(winAmount);
+    updateBalance();
+
+    nextRoundBtn.disabled = false;
   });
 
+  nextRoundBtn.addEventListener('click', () => {
+    resetGame();
+  });
+
+  function resetGame() {
+    // Pins und Nachbarwerte löschen
+    if(selectedCell) {
+      selectedCell.innerHTML = '';
+      clearNeighborMultipliers(selectedCell);
+    }
+    multiplierMap.forEach((_, idx) => {
+      const cell = board.children[idx];
+      cell.textContent = '';
+      cell.classList.remove('neighbor-multiplier');
+    });
+    multiplierMap.clear();
+
+    selectedCell = null;
+    pinPlaced = false;
+    multiplier = 1;
+    resultDiv.textContent = '';
+    confirmBtn.disabled = true;
+    nextRoundBtn.disabled = true;
+    coinRange.disabled = false;
+  }
+
+  function clearNeighborMultipliers(pinCell) {
+    const pinRow = parseInt(pinCell.dataset.row);
+    const pinCol = parseInt(pinCell.dataset.col);
+
+    for(let r = pinRow - 1; r <= pinRow + 1; r++) {
+      for(let c = pinCol - 1; c <= pinCol + 1; c++) {
+        if(r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
+        if(r === pinRow && c === pinCol) continue;
+
+        const idx = r * gridSize + c;
+        const cell = board.children[idx];
+        cell.textContent = '';
+        cell.classList.remove('neighbor-multiplier');
+      }
+    }
+  }
+
+  function updateBalance() {
+    balanceDiv.textContent = `Kontostand: ${balance.toFixed(2)} Coins`;
+  }
+
+  coinRange.addEventListener('input', () => {
+    currentBet = parseInt(coinRange.value);
+    coinValueDisplay.textContent = currentBet;
+  });
+
+  // Initial Balance update
+  updateBalance();
 </script>
 
 </body>
