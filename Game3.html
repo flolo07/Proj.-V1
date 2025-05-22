@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Shadow Cups</title>
   <style>
     body {
-      background: radial-gradient(#1a1a1a, #000000);
-      color: #f2f2f2;
+      background: radial-gradient(#0a0a0a, #000000);
+      color: #eee;
       font-family: 'Courier New', monospace;
       text-align: center;
-      padding: 20px;
+      padding: 30px;
     }
 
     h1 {
-      font-size: 2em;
-      color: #d6a100;
-      text-shadow: 0 0 5px #000;
+      font-size: 2.5em;
+      color: #ffcc00;
+      text-shadow: 0 0 10px #ffcc00aa;
     }
 
     .controls {
@@ -24,18 +23,20 @@
     }
 
     .controls input {
-      background: #222;
+      background: #111;
       border: 1px solid #444;
       color: #fff;
       padding: 5px;
+      width: 60px;
+      margin: 0 5px;
     }
 
     .cups-container {
       position: relative;
-      width: 90%;
-      max-width: 600px;
-      margin: 40px auto;
+      width: 100%;
+      max-width: 700px;
       height: 200px;
+      margin: 0 auto;
     }
 
     .cup {
@@ -47,42 +48,40 @@
       position: absolute;
       transition: all 0.5s ease-in-out;
       cursor: pointer;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
     }
 
     .cup:hover {
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+      box-shadow: 0 0 15px #ffcc00aa;
     }
 
     .coin {
-      position: absolute;
       width: 20px;
       height: 20px;
       background: gold;
       border-radius: 50%;
+      position: absolute;
       bottom: -10px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 2;
+      box-shadow: 0 0 5px gold;
     }
 
     #result {
-      font-size: 1.5em;
-      margin-top: 20px;
-    }
-
-    .shuffling {
-      pointer-events: none;
+      font-size: 1.4em;
+      margin-top: 30px;
+      height: 2em;
     }
   </style>
 </head>
 <body>
   <h1>Shadow Cups</h1>
   <div class="controls">
-    Hütchen: <input type="number" id="cupCount" min="2" max="8" value="3"/>
-    Einsatz: <input type="number" id="betAmount" min="1" value="10"/> 💰
+    Hütchen: <input type="number" id="cupCount" min="2" max="8" value="3">
+    Einsatz 💰: <input type="number" id="betAmount" min="1" value="10">
     <button onclick="startGame()">Start</button>
   </div>
+
   <div class="cups-container" id="cupsContainer"></div>
   <div id="result"></div>
 
@@ -92,58 +91,65 @@
 
     function startGame() {
       if (isShuffling) return;
-      const count = parseInt(document.getElementById('cupCount').value);
-      const bet = parseInt(document.getElementById('betAmount').value);
-      const container = document.getElementById('cupsContainer');
-      const result = document.getElementById('result');
-      container.innerHTML = '';
-      result.innerHTML = '';
       isShuffling = true;
 
+      const cupCount = parseInt(document.getElementById("cupCount").value);
+      const bet = parseInt(document.getElementById("betAmount").value);
+      const container = document.getElementById("cupsContainer");
+      const result = document.getElementById("result");
+      container.innerHTML = "";
+      result.textContent = "";
+
+      const cups = [];
+      const spacing = container.clientWidth / cupCount;
+
       // Create cups
-      let cups = [];
-      for (let i = 0; i < count; i++) {
-        const cup = document.createElement('div');
-        cup.classList.add('cup');
-        cup.style.left = `${(i * (100 / count)) + 5}%`;
+      for (let i = 0; i < cupCount; i++) {
+        const cup = document.createElement("div");
+        cup.classList.add("cup");
+        cup.style.left = `${i * spacing + spacing / 4}px`;
         cup.dataset.index = i;
         container.appendChild(cup);
         cups.push(cup);
       }
 
       // Place coin
-      coinIndex = Math.floor(Math.random() * count);
-      const coin = document.createElement('div');
-      coin.classList.add('coin');
+      coinIndex = Math.floor(Math.random() * cupCount);
+      const coin = document.createElement("div");
+      coin.className = "coin";
       cups[coinIndex].appendChild(coin);
 
-      // Wait a moment, then remove coin and shuffle
+      // Hide coin
       setTimeout(() => {
         coin.remove();
-        shuffleCups(cups, 10, () => {
+        shuffleCups(cups, 8, () => {
           isShuffling = false;
           cups.forEach(cup => {
-            cup.addEventListener('click', () => {
+            cup.onclick = () => {
               if (isShuffling) return;
               const selected = parseInt(cup.dataset.index);
               if (selected === coinIndex) {
-                result.innerHTML = `🎉 Richtiger Hütchen! +${bet * 2} 💰`;
+                result.innerHTML = `🎉 Treffer! Du gewinnst <b>+${bet * 2}</b> 💰`;
               } else {
-                result.innerHTML = `❌ Falsch geraten! -${bet} 💸`;
+                result.innerHTML = `❌ Leider daneben! Du verlierst <b>-${bet}</b> 💸`;
               }
               revealCoin(cups);
-            });
+              isShuffling = true;
+              setTimeout(() => {
+                isShuffling = false;
+              }, 1000);
+            };
           });
         });
       }, 1000);
     }
 
-    function shuffleCups(cups, moves, callback) {
-      let count = 0;
+    function shuffleCups(cups, moves, onDone) {
+      let swaps = 0;
       const interval = setInterval(() => {
-        if (count >= moves) {
+        if (swaps >= moves) {
           clearInterval(interval);
-          callback();
+          onDone();
           return;
         }
         let a = Math.floor(Math.random() * cups.length);
@@ -151,19 +157,20 @@
         if (a === b) return;
 
         let leftA = cups[a].style.left;
-        cups[a].style.left = cups[b].style.left;
+        let leftB = cups[b].style.left;
+        cups[a].style.left = leftB;
         cups[b].style.left = leftA;
 
         if (coinIndex === a) coinIndex = b;
         else if (coinIndex === b) coinIndex = a;
 
-        count++;
+        swaps++;
       }, 400);
     }
 
     function revealCoin(cups) {
-      const coin = document.createElement('div');
-      coin.classList.add('coin');
+      const coin = document.createElement("div");
+      coin.className = "coin";
       cups[coinIndex].appendChild(coin);
     }
   </script>
