@@ -83,16 +83,31 @@
 
   /* Nachbar-Multiplikator */
   .neighbor-multiplier {
-    color: #ffd966;
     font-weight: 700;
     font-size: 13px;
     user-select: none;
     pointer-events: none;
+    color: #ffd966;
+    transition: color 0.4s ease;
   }
 
   /* Wenn Multiplikator sichtbar */
   .show-multiplier {
     color: #ffd966;
+  }
+
+  /* Gewinnfarbe */
+  .win-cell {
+    background: #2a4d2a !important;
+    box-shadow: 0 0 8px 3px #6eff6e !important;
+    color: #6eff6e !important;
+  }
+
+  /* Verlustfarbe */
+  .lose-cell {
+    background: #4a2a2a !important;
+    box-shadow: 0 0 8px 3px #ff4c4c !important;
+    color: #ff6f61 !important;
   }
 
   /* Buttons */
@@ -148,6 +163,8 @@
     margin-bottom: 5px;
     min-width: 350px;
     text-align: center;
+    user-select: none;
+    transition: color 0.5s ease;
   }
 
   #balance {
@@ -219,6 +236,7 @@
     <li>Gewonnen: <span id="roundsWon">0</span></li>
     <li>Verloren: <span id="roundsLost">0</span></li>
     <li>Gesamtbilanz: <span id="totalProfit">0</span> Coins</li>
+    <li>Höchster Gewinn: <span id="highestWin">0</span> Coins</li>
   </ul>
 </section>
 
@@ -235,6 +253,7 @@
   const roundsWonSpan = document.getElementById('roundsWon');
   const roundsLostSpan = document.getElementById('roundsLost');
   const totalProfitSpan = document.getElementById('totalProfit');
+  const highestWinSpan = document.getElementById('highestWin');
 
   const gridSize = 15;
   let selectedCell = null;
@@ -249,6 +268,7 @@
   let roundsWon = 0;
   let roundsLost = 0;
   let totalProfit = 0;
+  let highestWin = 0;
 
   // Board aufbauen
   for(let i = 0; i < gridSize * gridSize; i++) {
@@ -259,6 +279,24 @@
     cell.dataset.col = i % gridSize;
     cell.addEventListener('click', () => onCellClick(cell));
     board.appendChild(cell);
+  }
+
+  // Zufälliger Multiplikator mit Gewichtung (mehr kleine, weniger große)
+  function getWeightedMultiplier() {
+    // Simple Verteilung: 70% Wahrscheinlichkeit kleiner Multiplikator, 30% größer, mit exponentiellem Falloff
+    let rand = Math.random();
+    if(rand < 0.7) {
+      // kleiner Bereich 0.2 - 1.5 (hauptsächlich Verluste & kleine Gewinne)
+      return (Math.pow(Math.random(), 2) * 1.3 + 0.2).toFixed(2);
+    } else {
+      // großer Bereich 1.5 - 5.0 (seltener große Gewinne)
+      return (Math.pow(Math.random(), 0.5) * 3.5 + 1.5).toFixed(2);
+    }
+  }
+
+  // Zufalls Bonus für Nachbarfeld (1.5x) mit geringer Wahrscheinlichkeit
+  function getNeighborBonus() {
+    return Math.random() < 0.15 ? 1.5 : 1.0;
   }
 
   function onCellClick(cell) {
@@ -293,13 +331,13 @@
     balance -= currentBet;
     updateBalance();
 
-    // Multiplier 0.2 bis 5.0 für Gewinn oder Verlust
-    multiplier = (Math.random() * 4.8 + 0.2).toFixed(2);
+    multiplier = getWeightedMultiplier();
     multiplierMap.clear();
 
     const pinRow = parseInt(selectedCell.dataset.row);
     const pinCol = parseInt(selectedCell.dataset.col);
 
+    // Markiere Gewinn/Verlustfarben an Nachbarzellen
     for(let r = pinRow - 1; r <= pinRow + 1; r++) {
       for(let c = pinCol - 1; c <= pinCol + 1; c++) {
         if(r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
@@ -308,25 +346,42 @@
         const idx = r * gridSize + c;
         const cell = board.children[idx];
 
-        // Nachbar multiplikatoren sind nur zur Info (immer positiv)
-        const m = (Math.random() * 4 + 1).toFixed(2);
-        multiplierMap.set(idx, m);
+        let baseMult = (Math.random() * 4 + 1).toFixed(2);
+        let bonus = getNeighborBonus();
+        let finalMult = (baseMult * bonus).toFixed(2);
 
-        cell.textContent = m;
+        multiplierMap.set(idx, finalMult);
+
+        cell.textContent = finalMult;
         cell.classList.add('neighbor-multiplier');
+
+        // Farbige Hervorhebung
+        if(finalMult > 3.5) {
+          cell.classList.add('win-cell');
+        } else if(finalMult < 1) {
+          cell.classList.add('lose-cell');
+        }
       }
     }
 
     const winAmount = (currentBet * multiplier).toFixed(2);
     const netProfit = winAmount - currentBet;
 
+    // Animation und Farbwechsel Ergebnis
     if(netProfit >= 0) {
       roundsWon++;
       resultDiv.style.color = '#6eff6e';
+      pulseEffect(resultDiv, '#6eff6e');
       resultDiv.textContent = `Gewonnen! Multiplikator: x${multiplier} → Gewinn: ${winAmount} Coins (+${netProfit.toFixed(2)})`;
+
+      if(netProfit > highestWin) {
+        highestWin = netProfit;
+        highestWinSpan.textContent = highestWin.toFixed(2);
+      }
     } else {
       roundsLost++;
       resultDiv.style.color = '#ff6f61';
+      pulseEffect(resultDiv, '#ff6f61');
       resultDiv.textContent = `Verloren! Multiplikator: x${multiplier} → Auszahlung: ${winAmount} Coins (${netProfit.toFixed(2)})`;
     }
 
@@ -352,7 +407,7 @@
     multiplierMap.forEach((_, idx) => {
       const cell = board.children[idx];
       cell.textContent = '';
-      cell.classList.remove('neighbor-multiplier');
+      cell.classList.remove('neighbor-multiplier', 'win-cell', 'lose-cell');
     });
     multiplierMap.clear();
 
@@ -378,7 +433,7 @@
         const idx = r * gridSize + c;
         const cell = board.children[idx];
         cell.textContent = '';
-        cell.classList.remove('neighbor-multiplier');
+        cell.classList.remove('neighbor-multiplier', 'win-cell', 'lose-cell');
       }
     }
   }
@@ -392,13 +447,31 @@
     roundsWonSpan.textContent = roundsWon;
     roundsLostSpan.textContent = roundsLost;
     totalProfitSpan.textContent = totalProfit.toFixed(2);
+    highestWinSpan.textContent = highestWin.toFixed(2);
   }
 
   coinRange.addEventListener('input', () => {
     currentBet = parseInt(coinRange.value);
     coinValueDisplay.textContent = currentBet;
+    confirmBtn.disabled = !selectedCell;
   });
 
+  // Pulsierender Effekt fürs Ergebnis (Blinken)
+  function pulseEffect(element, color) {
+    let count = 0;
+    const maxPulses = 6;
+    const originalColor = element.style.color;
+    const interval = setInterval(() => {
+      element.style.color = element.style.color === color ? originalColor : color;
+      count++;
+      if(count >= maxPulses) {
+        clearInterval(interval);
+        element.style.color = color;
+      }
+    }, 300);
+  }
+
+  // Start Update
   updateBalance();
   updateStats();
 
