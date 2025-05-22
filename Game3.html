@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lucky Hats</title>
+  <style>
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background: radial-gradient(#111, #000);
+      color: #FFD700;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .controls, .stats {
+      margin: 20px;
+    }
+    .hats {
+      display: flex;
+      gap: 20px;
+      margin: 30px 0;
+    }
+    .hat {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(to bottom, #555, #222);
+      border-radius: 50% 50% 0 0;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .hat:hover {
+      transform: scale(1.1);
+    }
+    .coin {
+      width: 30px;
+      height: 30px;
+      background: gold;
+      border-radius: 50%;
+      position: absolute;
+      bottom: -35px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+    }
+    .controls input[type=range] {
+      width: 150px;
+    }
+    .button {
+      background-color: #FFD700;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .button:hover {
+      background-color: #FFA500;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎩 Lucky Hats 🎩</h1>
+
+  <div class="game-container">
+    <div class="controls">
+      <label>Wähle Anzahl Hütchen (2-8): <input id="hatCount" type="number" min="2" max="8" value="3"></label><br>
+      <label>Einsatz: <span id="betDisplay">10</span> Coins
+        <input id="betRange" type="range" min="1" max="100" value="10">
+      </label><br>
+      <button class="button" onclick="startGame()">Spiel starten</button>
+    </div>
+
+    <div class="hats" id="hatsContainer"></div>
+
+    <div class="stats">
+      <p>💰 Coins: <span id="coins">100</span></p>
+      <p>🎯 Treffer: <span id="wins">0</span> | ❌ Fehlversuche: <span id="losses">0</span></p>
+    </div>
+  </div>
+
+  <script>
+    let coins = 100;
+    let wins = 0;
+    let losses = 0;
+
+    const betRange = document.getElementById("betRange");
+    const betDisplay = document.getElementById("betDisplay");
+    betRange.oninput = () => {
+      betDisplay.textContent = betRange.value;
+    };
+
+    function startGame() {
+      const hatCount = parseInt(document.getElementById("hatCount").value);
+      const bet = parseInt(betRange.value);
+
+      if (bet > coins) {
+        alert("Nicht genug Coins!");
+        return;
+      }
+
+      const hatsContainer = document.getElementById("hatsContainer");
+      hatsContainer.innerHTML = "";
+      const correctIndex = Math.floor(Math.random() * hatCount);
+
+      for (let i = 0; i < hatCount; i++) {
+        const hat = document.createElement("div");
+        hat.classList.add("hat");
+        const coin = document.createElement("div");
+        coin.classList.add("coin");
+        if (i === correctIndex) coin.dataset.correct = true;
+        hat.appendChild(coin);
+        hat.onclick = () => {
+          if (hat.dataset.clicked) return;
+          hat.dataset.clicked = true;
+          if (coin.dataset.correct) {
+            coin.style.display = "block";
+            coins += bet * 2;
+            wins++;
+          } else {
+            coin.style.display = "none";
+            coins -= bet;
+            losses++;
+          }
+          updateStats();
+          revealAll();
+        };
+        hatsContainer.appendChild(hat);
+      }
+    }
+
+    function revealAll() {
+      document.querySelectorAll(".hat .coin").forEach(c => {
+        if (c.dataset.correct) c.style.display = "block";
+      });
+    }
+
+    function updateStats() {
+      document.getElementById("coins").textContent = coins;
+      document.getElementById("wins").textContent = wins;
+      document.getElementById("losses").textContent = losses;
+    }
+  </script>
+</body>
+</html>
