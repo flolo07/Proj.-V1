@@ -1,128 +1,171 @@
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shadow Cups</title>
+  <style>
+    body {
+      background: radial-gradient(#1a1a1a, #000000);
+      color: #f2f2f2;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding: 20px;
+    }
 
-const generatePositions = (count: number, size: number) => {
-  const angleStep = (2 * Math.PI) / count;
-  const radius = 150;
-  return Array.from({ length: count }, (_, i) => {
-    const angle = i * angleStep;
-    return {
-      left: `${Math.cos(angle) * radius + size / 2}px`,
-      top: `${Math.sin(angle) * radius + size / 2}px`,
-    };
-  });
-};
+    h1 {
+      font-size: 2em;
+      color: #d6a100;
+      text-shadow: 0 0 5px #000;
+    }
 
-const ShellGame = () => {
-  const [cupCount, setCupCount] = useState(3);
-  const [coinIndex, setCoinIndex] = useState<number | null>(null);
-  const [shuffledIndices, setShuffledIndices] = useState<number[]>([]);
-  const [stage, setStage] = useState<"init" | "shuffling" | "guess">("init");
-  const [selected, setSelected] = useState<number | null>(null);
-  const [result, setResult] = useState<"win" | "lose" | null>(null);
-  const [positions, setPositions] = useState<{ left: string; top: string }[]>([]);
+    .controls {
+      margin-bottom: 20px;
+    }
 
-  useEffect(() => {
-    setPositions(generatePositions(cupCount, 400));
-  }, [cupCount]);
+    .controls input {
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 5px;
+    }
 
-  const startGame = () => {
-    const coin = Math.floor(Math.random() * cupCount);
-    setCoinIndex(coin);
-    setSelected(null);
-    setResult(null);
-    setStage("shuffling");
+    .cups-container {
+      position: relative;
+      width: 90%;
+      max-width: 600px;
+      margin: 40px auto;
+      height: 200px;
+    }
 
-    const initial = Array.from({ length: cupCount }, (_, i) => i);
-    let sequence = [...initial];
+    .cup {
+      width: 60px;
+      height: 80px;
+      background: linear-gradient(#222, #000);
+      border: 2px solid #555;
+      border-radius: 0 0 30px 30px;
+      position: absolute;
+      transition: all 0.5s ease-in-out;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
+    }
 
-    const shuffleSteps = 15;
-    let step = 0;
+    .cup:hover {
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    }
 
-    const shuffle = () => {
-      if (step >= shuffleSteps) {
-        setShuffledIndices(sequence);
-        setStage("guess");
-        return;
+    .coin {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: gold;
+      border-radius: 50%;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    #result {
+      font-size: 1.5em;
+      margin-top: 20px;
+    }
+
+    .shuffling {
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Shadow Cups</h1>
+  <div class="controls">
+    Hütchen: <input type="number" id="cupCount" min="2" max="8" value="3"/>
+    Einsatz: <input type="number" id="betAmount" min="1" value="10"/> 💰
+    <button onclick="startGame()">Start</button>
+  </div>
+  <div class="cups-container" id="cupsContainer"></div>
+  <div id="result"></div>
+
+  <script>
+    let coinIndex = 0;
+    let isShuffling = false;
+
+    function startGame() {
+      if (isShuffling) return;
+      const count = parseInt(document.getElementById('cupCount').value);
+      const bet = parseInt(document.getElementById('betAmount').value);
+      const container = document.getElementById('cupsContainer');
+      const result = document.getElementById('result');
+      container.innerHTML = '';
+      result.innerHTML = '';
+      isShuffling = true;
+
+      // Create cups
+      let cups = [];
+      for (let i = 0; i < count; i++) {
+        const cup = document.createElement('div');
+        cup.classList.add('cup');
+        cup.style.left = `${(i * (100 / count)) + 5}%`;
+        cup.dataset.index = i;
+        container.appendChild(cup);
+        cups.push(cup);
       }
-      const i = Math.floor(Math.random() * cupCount);
-      let j = Math.floor(Math.random() * cupCount);
-      while (j === i) j = Math.floor(Math.random() * cupCount);
-      [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
-      setShuffledIndices([...sequence]);
-      step++;
-      setTimeout(shuffle, 200);
-    };
 
-    shuffle();
-  };
+      // Place coin
+      coinIndex = Math.floor(Math.random() * count);
+      const coin = document.createElement('div');
+      coin.classList.add('coin');
+      cups[coinIndex].appendChild(coin);
 
-  const handleGuess = (index: number) => {
-    if (stage !== "guess") return;
-    setSelected(index);
-    const correct = shuffledIndices[index] === coinIndex;
-    setResult(correct ? "win" : "lose");
-    setStage("init");
-  };
+      // Wait a moment, then remove coin and shuffle
+      setTimeout(() => {
+        coin.remove();
+        shuffleCups(cups, 10, () => {
+          isShuffling = false;
+          cups.forEach(cup => {
+            cup.addEventListener('click', () => {
+              if (isShuffling) return;
+              const selected = parseInt(cup.dataset.index);
+              if (selected === coinIndex) {
+                result.innerHTML = `🎉 Richtiger Hütchen! +${bet * 2} 💰`;
+              } else {
+                result.innerHTML = `❌ Falsch geraten! -${bet} 💸`;
+              }
+              revealCoin(cups);
+            });
+          });
+        });
+      }, 1000);
+    }
 
-  return (
-    <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 min-h-screen text-white flex flex-col items-center justify-center gap-6 font-mono p-6">
-      <h1 className="text-4xl mb-2 tracking-widest text-purple-300 drop-shadow">Mystic Shells</h1>
-      <div className="flex items-center gap-4">
-        <label className="text-sm text-purple-100">Cups:</label>
-        <input
-          type="range"
-          min={2}
-          max={8}
-          value={cupCount}
-          onChange={(e) => setCupCount(Number(e.target.value))}
-        />
-        <span className="text-sm text-purple-100">{cupCount}</span>
-      </div>
+    function shuffleCups(cups, moves, callback) {
+      let count = 0;
+      const interval = setInterval(() => {
+        if (count >= moves) {
+          clearInterval(interval);
+          callback();
+          return;
+        }
+        let a = Math.floor(Math.random() * cups.length);
+        let b = Math.floor(Math.random() * cups.length);
+        if (a === b) return;
 
-      <div className="relative w-[400px] h-[400px]">
-        {Array.from({ length: cupCount }).map((_, i) => {
-          const idx = shuffledIndices[i] ?? i;
-          const pos = positions[i] || { left: "0px", top: "0px" };
-          const isSelected = selected === i;
-          const isCoin = result && shuffledIndices[i] === coinIndex;
+        let leftA = cups[a].style.left;
+        cups[a].style.left = cups[b].style.left;
+        cups[b].style.left = leftA;
 
-          return (
-            <div
-              key={i}
-              style={{ position: "absolute", ...pos }}
-              className="transition-all duration-300 ease-in-out"
-            >
-              <button
-                disabled={stage !== "guess"}
-                onClick={() => handleGuess(i)}
-                className={`w-16 h-20 rounded-t-full border-4 border-purple-700 bg-gradient-to-br from-purple-900 to-purple-700 hover:brightness-110 shadow-lg ${
-                  isSelected ? "ring-4 ring-yellow-400" : ""
-                } ${result && isCoin ? "bg-green-600" : ""}`}
-              >
-                {result && isCoin ? "💰" : ""}
-              </button>
-            </div>
-          );
-        })}
-      </div>
+        if (coinIndex === a) coinIndex = b;
+        else if (coinIndex === b) coinIndex = a;
 
-      <div className="flex flex-col items-center gap-2">
-        <Button onClick={startGame} className="bg-purple-800 hover:bg-purple-600">
-          Start Round
-        </Button>
-        {result && (
-          <p
-            className={`text-xl ${
-              result === "win" ? "text-green-400" : "text-red-400"
-            }`}
-          >
-            You {result}!
-          </p>
-        )}
-      </div>
-    </div>
-  );
-};
+        count++;
+      }, 400);
+    }
 
-export default ShellGame;
+    function revealCoin(cups) {
+      const coin = document.createElement('div');
+      coin.classList.add('coin');
+      cups[coinIndex].appendChild(coin);
+    }
+  </script>
+</body>
+</html>
