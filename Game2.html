@@ -3,137 +3,161 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Golf-Dart Glücksspiel 64x64</title>
+<title>PinQuest – Das Glücksspiel mit Multiplikator</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1e1e2f;
-    color: #eee;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    font-family: 'Orbitron', monospace, Arial, sans-serif;
+    color: #e0e7ff;
+    margin: 0;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 15px;
     user-select: none;
   }
 
   h1 {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+    font-weight: 700;
+    font-size: 2.4rem;
+    text-shadow: 0 0 8px #ff6f61;
   }
 
   #board {
     display: grid;
-    grid-template-columns: repeat(64, 15px);
-    grid-template-rows: repeat(64, 15px);
-    gap: 1px;
-    background: #22223b;
-    padding: 5px;
-    border-radius: 8px;
-    max-height: 960px;
-    max-width: 960px;
-    overflow: auto;
-    margin-bottom: 15px;
-    border: 1px solid #444;
+    grid-template-columns: repeat(15, 40px);
+    grid-template-rows: repeat(15, 40px);
+    gap: 3px;
+    background: #111820;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #ff6f61aa;
+    margin: 20px 0;
   }
 
   .cell {
-    width: 15px;
-    height: 15px;
-    background-color: #2a2a40;
-    border-radius: 3px;
+    background: #1c2733;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    box-shadow: inset 0 0 5px #2f3d4a;
+    position: relative;
+    transition: background-color 0.3s ease;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 10px;
-    color: #eee;
-    user-select: none;
+    font-weight: 600;
+    font-size: 14px;
+    color: transparent;
+  }
+  .cell:hover:not(.pin-placed):not(.disabled) {
+    background: #31465c;
   }
 
-  /* Schachbrett Muster */
-  .cell:nth-child(odd) {
-    background-color: #3a3a58;
-  }
-  .row-even .cell:nth-child(even) {
-    background-color: #3a3a58;
-  }
-  .row-even .cell:nth-child(odd) {
-    background-color: #2a2a40;
-  }
-
+  /* Pin Styling */
   .pin {
-    width: 12px;
-    height: 12px;
-    background-color: #ff5757;
+    width: 22px;
+    height: 22px;
+    background: radial-gradient(circle at center, #ff5c5c, #b33a3a);
     border-radius: 50%;
-    box-shadow: 0 0 6px #ff5757;
+    box-shadow: 0 0 10px 2px #ff5c5caa;
+    animation: pulse 1.5s infinite ease-in-out;
   }
 
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 10px 2px #ff5c5caa;
+    }
+    50% {
+      box-shadow: 0 0 20px 6px #ff5c5ccc;
+    }
+  }
+
+  /* Nachbar-Multiplikator */
   .neighbor-multiplier {
-    position: relative;
-    color: #ffd166;
-    font-weight: bold;
-  }
-
-  .neighbor-multiplier::after {
-    content: attr(data-multiplier);
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 9px;
-    color: #ffd166;
+    color: #ffd966;
+    font-weight: 700;
+    font-size: 13px;
+    user-select: none;
     pointer-events: none;
   }
 
-  button {
-    margin: 5px 10px 15px 10px;
-    padding: 10px 25px;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    background: #5a7ffb;
-    color: white;
-    transition: background 0.3s;
-  }
-  button:disabled {
-    background: #999;
-    cursor: not-allowed;
-  }
-  button:hover:not(:disabled) {
-    background: #4466db;
+  /* Wenn Multiplikator sichtbar */
+  .show-multiplier {
+    color: #ffd966;
   }
 
+  /* Buttons */
+  button {
+    background: #ff6f61;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 12px 25px;
+    margin: 0 15px 20px 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px #ff6f6155;
+    transition: background-color 0.3s ease;
+  }
+  button:disabled {
+    background: #8a8a8a;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  button:hover:not(:disabled) {
+    background: #ff4433;
+  }
+
+  /* Einsatz Regler */
+  #coinControl {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+  }
+  #coinControl label {
+    user-select: none;
+  }
+  #coinRange {
+    width: 220px;
+  }
+  #coinValue {
+    min-width: 60px;
+    font-weight: 700;
+    color: #ffd966;
+    text-align: right;
+  }
+
+  /* Ergebnis & Kontostand */
   #result {
-    margin-top: 10px;
-    font-size: 1.4rem;
-    font-weight: bold;
-    min-height: 40px;
-    color: #ffd166;
+    font-size: 1.3rem;
+    font-weight: 700;
+    min-height: 32px;
+    color: #ffd966;
+    text-shadow: 0 0 6px #ffd966aa;
+    margin-bottom: 5px;
+  }
+
+  #balance {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 10px;
     user-select: none;
   }
 
-  #coinControl {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  #coinValue {
-    font-weight: bold;
-    min-width: 50px;
-    text-align: right;
-  }
 </style>
 </head>
 <body>
 
-<h1>Golf-Dart Glücksspiel 64x64</h1>
+<h1>PinQuest – Das Glücksspiel mit Multiplikator</h1>
 
 <div id="coinControl">
-  <label for="coinRange">Einsatz: </label>
+  <label for="coinRange">Einsatz:</label>
   <input type="range" id="coinRange" min="1" max="1000" step="1" value="100" />
   <div id="coinValue">100</div>
 </div>
@@ -157,7 +181,7 @@
   const coinRange = document.getElementById('coinRange');
   const coinValueDisplay = document.getElementById('coinValue');
 
-  const gridSize = 64;
+  const gridSize = 15;
   let selectedCell = null;
   let pinPlaced = false;
   let balance = 1000;
@@ -165,7 +189,7 @@
   let multiplier = 1;
   let multiplierMap = new Map();
 
-  // Board aufbauen (einfach 1D Grid, Zeilen/Spalten nur zur Logik)
+  // Board aufbauen
   for(let i = 0; i < gridSize * gridSize; i++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
@@ -177,16 +201,15 @@
   }
 
   function onCellClick(cell) {
-    if(pinPlaced) return; // nur eine Runde
+    if(pinPlaced) return;
 
     if(selectedCell) {
-      selectedCell.innerHTML = ''; // alten Pin löschen
+      selectedCell.innerHTML = '';
       clearNeighborMultipliers(selectedCell);
     }
 
     selectedCell = cell;
 
-    // Pin als Vorschau
     const pin = document.createElement('div');
     pin.classList.add('pin');
     cell.appendChild(pin);
@@ -198,7 +221,7 @@
   confirmBtn.addEventListener('click', () => {
     if(!selectedCell) return;
     if(currentBet > balance) {
-      alert('Du hast nicht genug Coins für diesen Einsatz!');
+      alert('Nicht genug Coins für diesen Einsatz!');
       return;
     }
 
@@ -206,40 +229,33 @@
     confirmBtn.disabled = true;
     coinRange.disabled = true;
 
-    // Einsätze abziehen
     balance -= currentBet;
     updateBalance();
 
-    // Multiplikator für Pin zufällig
     multiplier = (Math.random() * 4 + 1).toFixed(2);
     multiplierMap.clear();
 
-    // Multiplikatoren für Nachbarfelder setzen (1 Block Abstand = 8 Felder)
     const pinRow = parseInt(selectedCell.dataset.row);
     const pinCol = parseInt(selectedCell.dataset.col);
 
     for(let r = pinRow - 1; r <= pinRow + 1; r++) {
       for(let c = pinCol - 1; c <= pinCol + 1; c++) {
         if(r < 0 || r >= gridSize || c < 0 || c >= gridSize) continue;
-        if(r === pinRow && c === pinCol) continue; // Pin selbst überspringen
+        if(r === pinRow && c === pinCol) continue;
 
         const idx = r * gridSize + c;
         const cell = board.children[idx];
-        // Zufälligen Multiplikator generieren (1.00 bis 5.00)
+
         const m = (Math.random() * 4 + 1).toFixed(2);
         multiplierMap.set(idx, m);
 
-        // Multiplikator anzeigen
         cell.textContent = m;
         cell.classList.add('neighbor-multiplier');
       }
     }
 
-    // Multiplikator anzeigen Ergebnis
     const winAmount = (currentBet * multiplier).toFixed(2);
-    resultDiv.textContent = `Dein Multiplikator: x${multiplier} → Gewinn: ${winAmount} Coins`;
-
-    // Gewinn gutschreiben
+    resultDiv.textContent = `Multiplikator: x${multiplier} → Gewinn: ${winAmount} Coins`;
     balance += parseFloat(winAmount);
     updateBalance();
 
@@ -251,7 +267,6 @@
   });
 
   function resetGame() {
-    // Pins und Nachbarwerte löschen
     if(selectedCell) {
       selectedCell.innerHTML = '';
       clearNeighborMultipliers(selectedCell);
@@ -298,8 +313,8 @@
     coinValueDisplay.textContent = currentBet;
   });
 
-  // Initial Balance update
   updateBalance();
+
 </script>
 
 </body>
