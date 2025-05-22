@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Golf-Dart Glücksspiel</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1e1e2f;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    user-select: none;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  #board {
+    display: grid;
+    grid-template-columns: repeat(8, 50px);
+    grid-template-rows: repeat(8, 50px);
+    gap: 3px;
+    background: #22223b;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .cell {
+    width: 50px;
+    height: 50px;
+    background-color: #2a2a40;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Schachbrett Muster */
+  .cell:nth-child(odd) {
+    background-color: #3a3a58;
+  }
+  .row-even .cell:nth-child(even) {
+    background-color: #3a3a58;
+  }
+  .row-even .cell:nth-child(odd) {
+    background-color: #2a2a40;
+  }
+
+  .pin {
+    width: 20px;
+    height: 20px;
+    background-color: #ff5757;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ff5757;
+  }
+
+  button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #5a7ffb;
+    color: white;
+    transition: background 0.3s;
+  }
+  button:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+  button:hover:not(:disabled) {
+    background: #4466db;
+  }
+
+  #result {
+    margin-top: 25px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-height: 40px;
+    color: #ffd166;
+  }
+</style>
+</head>
+<body>
+
+<h1>Golf-Dart Glücksspiel</h1>
+
+<div id="board"></div>
+
+<button id="confirmBtn" disabled>Pin bestätigen</button>
+
+<div id="result"></div>
+
+<script>
+  const board = document.getElementById('board');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const resultDiv = document.getElementById('result');
+
+  const gridSize = 8;
+  let selectedCell = null;
+  let pinPlaced = false;
+
+  // Board erstellen mit Schachbrett-Muster (zeilenweise class)
+  for(let row = 0; row < gridSize; row++) {
+    const rowDiv = document.createElement('div');
+    rowDiv.classList.add('row');
+    if(row % 2 === 0) {
+      rowDiv.classList.add('row-even');
+    }
+    for(let col = 0; col < gridSize; col++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.dataset.row = row;
+      cell.dataset.col = col;
+      cell.addEventListener('click', () => onCellClick(cell));
+      rowDiv.appendChild(cell);
+      board.appendChild(cell);
+    }
+  }
+
+  function onCellClick(cell) {
+    if(pinPlaced) return; // Nur eine Runde
+
+    if(selectedCell) {
+      // Entferne alten Pin
+      selectedCell.innerHTML = '';
+    }
+
+    selectedCell = cell;
+    // Pin als Vorschau anzeigen
+    const pin = document.createElement('div');
+    pin.classList.add('pin');
+    cell.appendChild(pin);
+
+    confirmBtn.disabled = false;
+    resultDiv.textContent = '';
+  }
+
+  confirmBtn.addEventListener('click', () => {
+    if(!selectedCell) return;
+
+    pinPlaced = true;
+    confirmBtn.disabled = true;
+
+    // Zufälligen Multiplikator generieren (1.00 bis 5.00, 2 Dezimalstellen)
+    const multiplier = (Math.random() * 4 + 1).toFixed(2);
+
+    resultDiv.textContent = `Dein Multiplikator ist: x${multiplier}`;
+  });
+
+</script>
+
+</body>
+</html>
