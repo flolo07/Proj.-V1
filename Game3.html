@@ -1,155 +1,128 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lucky Hats</title>
-  <style>
-    body {
-      font-family: 'Courier New', Courier, monospace;
-      background: radial-gradient(#111, #000);
-      color: #FFD700;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
-    .game-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .controls, .stats {
-      margin: 20px;
-    }
-    .hats {
-      display: flex;
-      gap: 20px;
-      margin: 30px 0;
-    }
-    .hat {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(to bottom, #555, #222);
-      border-radius: 50% 50% 0 0;
-      position: relative;
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-    .hat:hover {
-      transform: scale(1.1);
-    }
-    .coin {
-      width: 30px;
-      height: 30px;
-      background: gold;
-      border-radius: 50%;
-      position: absolute;
-      bottom: -35px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: none;
-    }
-    .controls input[type=range] {
-      width: 150px;
-    }
-    .button {
-      background-color: #FFD700;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      margin: 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .button:hover {
-      background-color: #FFA500;
-    }
-  </style>
-</head>
-<body>
-  <h1>🎩 Lucky Hats 🎩</h1>
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
-  <div class="game-container">
-    <div class="controls">
-      <label>Wähle Anzahl Hütchen (2-8): <input id="hatCount" type="number" min="2" max="8" value="3"></label><br>
-      <label>Einsatz: <span id="betDisplay">10</span> Coins
-        <input id="betRange" type="range" min="1" max="100" value="10">
-      </label><br>
-      <button class="button" onclick="startGame()">Spiel starten</button>
-    </div>
-
-    <div class="hats" id="hatsContainer"></div>
-
-    <div class="stats">
-      <p>💰 Coins: <span id="coins">100</span></p>
-      <p>🎯 Treffer: <span id="wins">0</span> | ❌ Fehlversuche: <span id="losses">0</span></p>
-    </div>
-  </div>
-
-  <script>
-    let coins = 100;
-    let wins = 0;
-    let losses = 0;
-
-    const betRange = document.getElementById("betRange");
-    const betDisplay = document.getElementById("betDisplay");
-    betRange.oninput = () => {
-      betDisplay.textContent = betRange.value;
+const generatePositions = (count: number, size: number) => {
+  const angleStep = (2 * Math.PI) / count;
+  const radius = 150;
+  return Array.from({ length: count }, (_, i) => {
+    const angle = i * angleStep;
+    return {
+      left: `${Math.cos(angle) * radius + size / 2}px`,
+      top: `${Math.sin(angle) * radius + size / 2}px`,
     };
+  });
+};
 
-    function startGame() {
-      const hatCount = parseInt(document.getElementById("hatCount").value);
-      const bet = parseInt(betRange.value);
+const ShellGame = () => {
+  const [cupCount, setCupCount] = useState(3);
+  const [coinIndex, setCoinIndex] = useState<number | null>(null);
+  const [shuffledIndices, setShuffledIndices] = useState<number[]>([]);
+  const [stage, setStage] = useState<"init" | "shuffling" | "guess">("init");
+  const [selected, setSelected] = useState<number | null>(null);
+  const [result, setResult] = useState<"win" | "lose" | null>(null);
+  const [positions, setPositions] = useState<{ left: string; top: string }[]>([]);
 
-      if (bet > coins) {
-        alert("Nicht genug Coins!");
+  useEffect(() => {
+    setPositions(generatePositions(cupCount, 400));
+  }, [cupCount]);
+
+  const startGame = () => {
+    const coin = Math.floor(Math.random() * cupCount);
+    setCoinIndex(coin);
+    setSelected(null);
+    setResult(null);
+    setStage("shuffling");
+
+    const initial = Array.from({ length: cupCount }, (_, i) => i);
+    let sequence = [...initial];
+
+    const shuffleSteps = 15;
+    let step = 0;
+
+    const shuffle = () => {
+      if (step >= shuffleSteps) {
+        setShuffledIndices(sequence);
+        setStage("guess");
         return;
       }
+      const i = Math.floor(Math.random() * cupCount);
+      let j = Math.floor(Math.random() * cupCount);
+      while (j === i) j = Math.floor(Math.random() * cupCount);
+      [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
+      setShuffledIndices([...sequence]);
+      step++;
+      setTimeout(shuffle, 200);
+    };
 
-      const hatsContainer = document.getElementById("hatsContainer");
-      hatsContainer.innerHTML = "";
-      const correctIndex = Math.floor(Math.random() * hatCount);
+    shuffle();
+  };
 
-      for (let i = 0; i < hatCount; i++) {
-        const hat = document.createElement("div");
-        hat.classList.add("hat");
-        const coin = document.createElement("div");
-        coin.classList.add("coin");
-        if (i === correctIndex) coin.dataset.correct = true;
-        hat.appendChild(coin);
-        hat.onclick = () => {
-          if (hat.dataset.clicked) return;
-          hat.dataset.clicked = true;
-          if (coin.dataset.correct) {
-            coin.style.display = "block";
-            coins += bet * 2;
-            wins++;
-          } else {
-            coin.style.display = "none";
-            coins -= bet;
-            losses++;
-          }
-          updateStats();
-          revealAll();
-        };
-        hatsContainer.appendChild(hat);
-      }
-    }
+  const handleGuess = (index: number) => {
+    if (stage !== "guess") return;
+    setSelected(index);
+    const correct = shuffledIndices[index] === coinIndex;
+    setResult(correct ? "win" : "lose");
+    setStage("init");
+  };
 
-    function revealAll() {
-      document.querySelectorAll(".hat .coin").forEach(c => {
-        if (c.dataset.correct) c.style.display = "block";
-      });
-    }
+  return (
+    <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 min-h-screen text-white flex flex-col items-center justify-center gap-6 font-mono p-6">
+      <h1 className="text-4xl mb-2 tracking-widest text-purple-300 drop-shadow">Mystic Shells</h1>
+      <div className="flex items-center gap-4">
+        <label className="text-sm text-purple-100">Cups:</label>
+        <input
+          type="range"
+          min={2}
+          max={8}
+          value={cupCount}
+          onChange={(e) => setCupCount(Number(e.target.value))}
+        />
+        <span className="text-sm text-purple-100">{cupCount}</span>
+      </div>
 
-    function updateStats() {
-      document.getElementById("coins").textContent = coins;
-      document.getElementById("wins").textContent = wins;
-      document.getElementById("losses").textContent = losses;
-    }
-  </script>
-</body>
-</html>
+      <div className="relative w-[400px] h-[400px]">
+        {Array.from({ length: cupCount }).map((_, i) => {
+          const idx = shuffledIndices[i] ?? i;
+          const pos = positions[i] || { left: "0px", top: "0px" };
+          const isSelected = selected === i;
+          const isCoin = result && shuffledIndices[i] === coinIndex;
+
+          return (
+            <div
+              key={i}
+              style={{ position: "absolute", ...pos }}
+              className="transition-all duration-300 ease-in-out"
+            >
+              <button
+                disabled={stage !== "guess"}
+                onClick={() => handleGuess(i)}
+                className={`w-16 h-20 rounded-t-full border-4 border-purple-700 bg-gradient-to-br from-purple-900 to-purple-700 hover:brightness-110 shadow-lg ${
+                  isSelected ? "ring-4 ring-yellow-400" : ""
+                } ${result && isCoin ? "bg-green-600" : ""}`}
+              >
+                {result && isCoin ? "💰" : ""}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex flex-col items-center gap-2">
+        <Button onClick={startGame} className="bg-purple-800 hover:bg-purple-600">
+          Start Round
+        </Button>
+        {result && (
+          <p
+            className={`text-xl ${
+              result === "win" ? "text-green-400" : "text-red-400"
+            }`}
+          >
+            You {result}!
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ShellGame;
