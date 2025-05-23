@@ -2,237 +2,234 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Shadow Cups – Mystic Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mystisches Hütchenspiel</title>
   <style>
     body {
-      background: radial-gradient(ellipse at center, #1a1a1a, #000);
-      color: #eee;
-      font-family: 'Courier New', monospace;
-      text-align: center;
-      padding: 30px;
+      margin: 0;
+      font-family: 'Georgia', serif;
+      background: radial-gradient(ellipse at center, #1a1a1a 0%, #000000 100%);
+      color: #ffd700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
     }
 
     h1 {
-      font-size: 2.7em;
-      color: #ffcc00;
-      text-shadow: 0 0 12px #ffcc00bb;
-      margin-bottom: 0.2em;
+      font-size: 2.5rem;
+      color: #ffdf00;
+      text-shadow: 0 0 10px #ffdf00aa;
     }
 
-    .game-ui {
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-
-    .game-ui input, .game-ui button {
-      background: #111;
-      border: 1px solid #555;
-      color: #fff;
-      padding: 6px 10px;
-      font-family: monospace;
-      font-size: 1em;
-      border-radius: 4px;
-    }
-
-    #balance {
-      font-weight: bold;
-      color: #00ffcc;
-      text-shadow: 0 0 5px #00ffcc77;
-    }
-
-    .board-frame {
-      border: 2px solid #555;
-      background: rgba(255,255,255,0.02);
+    .game-container {
+      background: rgba(30, 30, 30, 0.95);
+      border: 2px solid #444;
+      border-radius: 15px;
       padding: 20px;
       max-width: 800px;
-      margin: 0 auto;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #222;
+      width: 100%;
+      box-shadow: 0 0 30px #111;
     }
 
-    .cups-container {
-      position: relative;
-      width: 100%;
-      height: 200px;
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .controls label,
+    .controls input,
+    .controls button {
+      margin: 10px;
+      font-size: 1rem;
+    }
+
+    button {
+      background: linear-gradient(to bottom, #8b0000, #550000);
+      color: #ffd700;
+      border: 2px solid #aa0000;
+      border-radius: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px #440000;
+    }
+
+    button:hover {
+      background: #660000;
+      box-shadow: 0 0 20px #880000;
+    }
+
+    .cups {
       display: flex;
       justify-content: center;
-      align-items: flex-end;
-      gap: 30px;
+      margin-bottom: 20px;
+      position: relative;
     }
 
     .cup {
-      width: 70px;
-      height: 90px;
-      background: linear-gradient(to top, #333, #111);
-      border-radius: 0 0 30px 30px;
-      border: 3px solid #555;
-      box-shadow: inset 0 10px 20px #000, 0 0 10px #000;
+      width: 80px;
+      height: 80px;
+      margin: 0 10px;
+      background: radial-gradient(circle, #222 0%, #000 100%);
+      border: 3px solid #ffd700;
+      border-radius: 50%;
       position: relative;
       cursor: pointer;
-      transition: all 0.4s ease-in-out;
+      transition: transform 0.3s;
     }
 
     .cup:hover {
-      border-color: #ffcc00;
-      box-shadow: 0 0 12px #ffcc00aa, inset 0 10px 20px #000;
+      transform: scale(1.1);
+      box-shadow: 0 0 10px #ffdf00;
     }
 
-    .coin {
-      width: 24px;
-      height: 24px;
-      background: radial-gradient(circle, gold, orange);
+    .ball {
+      width: 20px;
+      height: 20px;
+      background: red;
       border-radius: 50%;
       position: absolute;
-      bottom: -12px;
+      bottom: -30px;
       left: 50%;
       transform: translateX(-50%);
-      box-shadow: 0 0 6px gold;
-      z-index: 10;
+      box-shadow: 0 0 10px red;
     }
 
-    #result {
-      font-size: 1.4em;
-      margin-top: 30px;
-      height: 2em;
+    .stats {
+      background: #111;
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 10px;
+      color: #ddd;
+      font-size: 0.9rem;
+      box-shadow: inset 0 0 10px #222;
+    }
+
+    .stats p {
+      margin: 5px 0;
+    }
+
+    .highlight {
+      color: #0f0;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>🪄 Shadow Cups</h1>
-  <div class="game-ui">
-    Hütchenanzahl: <input type="number" id="cupCount" min="2" max="8" value="3">
-    Einsatz: <input type="number" id="betAmount" min="1" value="10">
-    <button onclick="startGame()">Start</button>
-    Kontostand: <span id="balance">100</span> 💰
+  <h1>🎩 Mystisches Hütchenspiel 🎩</h1>
+  <div class="game-container">
+    <div class="controls">
+      <label for="numCups">Becher:</label>
+      <input type="number" id="numCups" min="2" max="8" value="3" />
+      <label for="betAmount">Einsatz:</label>
+      <input type="number" id="betAmount" value="10" />
+      <button onclick="startRound()">🎲 Starten</button>
+    </div>
+    <div class="cups" id="cupsContainer"></div>
+    <div class="stats">
+      <p>💰 Kontostand: <span id="balance" class="highlight">100</span> Coins</p>
+      <p>🏆 Gewinnrate: <span id="winRate">0%</span></p>
+      <p>🔥 Beste Serie: <span id="bestStreak">0</span></p>
+      <p>💎 Größter Gewinn: <span id="biggestWin">0</span></p>
+      <p>📊 Durchschnittlicher Einsatz: <span id="avgBet">0</span></p>
+    </div>
   </div>
-
-  <div class="board-frame">
-    <div class="cups-container" id="cupsContainer"></div>
-  </div>
-
-  <div id="result"></div>
 
   <script>
-    let coinIndex = 0;
-    let isShuffling = false;
     let balance = 100;
+    let totalRounds = 0;
+    let wins = 0;
+    let currentStreak = 0;
+    let bestStreak = 0;
+    let biggestWin = 0;
+    let totalBet = 0;
 
-    function updateBalanceDisplay() {
-      document.getElementById("balance").textContent = balance;
+    function updateStats() {
+      document.getElementById('balance').textContent = balance;
+      document.getElementById('winRate').textContent = `${((wins / totalRounds) * 100 || 0).toFixed(1)}%`;
+      document.getElementById('bestStreak').textContent = bestStreak;
+      document.getElementById('biggestWin').textContent = biggestWin;
+      document.getElementById('avgBet').textContent = (totalBet / totalRounds || 0).toFixed(1);
     }
 
-    function startGame() {
-      if (isShuffling) return;
-      const cupCount = parseInt(document.getElementById("cupCount").value);
-      const bet = parseInt(document.getElementById("betAmount").value);
-      const result = document.getElementById("result");
-      const container = document.getElementById("cupsContainer");
+    function createCups(num, ballIndex) {
+      const container = document.getElementById('cupsContainer');
+      container.innerHTML = '';
 
-      if (bet > balance || bet < 1) {
-        result.textContent = "❌ Ungültiger Einsatz!";
+      for (let i = 0; i < num; i++) {
+        const cup = document.createElement('div');
+        cup.classList.add('cup');
+        cup.dataset.index = i;
+
+        if (i === ballIndex) {
+          const ball = document.createElement('div');
+          ball.classList.add('ball');
+          cup.appendChild(ball);
+        }
+
+        cup.onclick = () => guess(i, ballIndex, parseInt(document.getElementById('betAmount').value));
+        container.appendChild(cup);
+      }
+    }
+
+    function shuffleCups(cups) {
+      for (let i = cups.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cups[i], cups[j]] = [cups[j], cups[i]];
+      }
+      return cups;
+    }
+
+    function startRound() {
+      const numCups = parseInt(document.getElementById('numCups').value);
+      const bet = parseInt(document.getElementById('betAmount').value);
+      if (bet > balance || bet <= 0) {
+        alert('Ungültiger Einsatz!');
         return;
       }
 
-      result.textContent = "";
-      container.innerHTML = "";
-      isShuffling = true;
-
-      const cups = [];
-      coinIndex = Math.floor(Math.random() * cupCount);
-      const spacing = 100;
-
-      // Neue Runde -> Einsatz abziehen
-      balance -= bet;
-      updateBalanceDisplay();
-
-      // Erstelle Becher
-      for (let i = 0; i < cupCount; i++) {
-        const cup = document.createElement("div");
-        cup.classList.add("cup");
-        cup.dataset.index = i;
-        container.appendChild(cup);
-        cups.push(cup);
-      }
-
-      // Zeige kurz, wo die Münze ist
-      const coin = document.createElement("div");
-      coin.className = "coin";
-      cups[coinIndex].appendChild(coin);
+      const ballIndex = Math.floor(Math.random() * numCups);
+      createCups(numCups, ballIndex);
 
       setTimeout(() => {
-        coin.remove();
-        shuffleCups(cups, 8, () => {
-          isShuffling = false;
-          cups.forEach(cup => {
-            cup.onclick = () => {
-              if (isShuffling) return;
-              const selected = parseInt(cup.dataset.index);
-              revealCoin(cups);
-              if (selected === coinIndex) {
-                const win = bet * 2;
-                balance += win;
-                result.innerHTML = `🎉 Treffer! +${win} 💰`;
-              } else {
-                result.innerHTML = `❌ Verloren! -${bet} 💸`;
-              }
-              updateBalanceDisplay();
-              isShuffling = true;
-              setTimeout(() => {
-                isShuffling = false;
-              }, 1200);
-            };
-          });
+        const cups = Array.from(document.getElementsByClassName('cup'));
+        shuffleCups(cups).forEach(cup => document.getElementById('cupsContainer').appendChild(cup));
+        // Ball ausblenden nach Mischen
+        cups.forEach(c => {
+          const b = c.querySelector('.ball');
+          if (b) b.remove();
         });
       }, 1000);
     }
 
-    function shuffleCups(cups, moves, onDone) {
-      let swaps = 0;
-      const interval = setInterval(() => {
-        if (swaps >= moves) {
-          clearInterval(interval);
-          onDone();
-          return;
-        }
-        let a = Math.floor(Math.random() * cups.length);
-        let b = Math.floor(Math.random() * cups.length);
-        if (a === b) return;
+    function guess(choice, ballIndex, bet) {
+      totalRounds++;
+      totalBet += bet;
 
-        let posA = cups[a].style.left;
-        let posB = cups[b].style.left;
+      const won = choice === ballIndex;
+      if (won) {
+        let winAmount = bet * 2;
+        balance += winAmount;
+        currentStreak++;
+        wins++;
+        if (winAmount > biggestWin) biggestWin = winAmount;
+        if (currentStreak > bestStreak) bestStreak = currentStreak;
+        alert(`🎉 Richtiger Becher! Du gewinnst ${winAmount} Coins!`);
+      } else {
+        balance -= bet;
+        currentStreak = 0;
+        alert(`😢 Falscher Becher! Der Ball war unter Becher ${ballIndex + 1}`);
+      }
 
-        // Swap DOM positions visually (with transition)
-        cups[a].style.transform = `translateX(${(b - a) * 100}px)`;
-        cups[b].style.transform = `translateX(${(a - b) * 100}px)`;
-
-        setTimeout(() => {
-          cups[a].style.transform = "";
-          cups[b].style.transform = "";
-
-          const parent = cups[a].parentNode;
-          parent.insertBefore(cups[b], cups[a]);
-          parent.insertBefore(cups[a], cups[b]);
-
-        }, 300);
-
-        if (coinIndex === a) coinIndex = b;
-        else if (coinIndex === b) coinIndex = a;
-
-        swaps++;
-      }, 500);
+      updateStats();
+      createCups(parseInt(document.getElementById('numCups').value), ballIndex); // Zeigt Ball nochmal
     }
 
-    function revealCoin(cups) {
-      const coin = document.createElement("div");
-      coin.className = "coin";
-      cups[coinIndex].appendChild(coin);
-    }
-
-    updateBalanceDisplay();
+    updateStats();
   </script>
 </body>
 </html>
